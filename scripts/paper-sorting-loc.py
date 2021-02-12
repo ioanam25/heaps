@@ -21,18 +21,12 @@ from pairing_heap import PairingHeap
 COUNT_TYPE_BOTH = 0
 COUNT_TYPE_LINKS = -1
 COUNT_TYPE_COMPS = -2
-MAXSIZE = 17
 NUMBER_TESTS = 10  # number of tests to run
-TEST_SIZES = [j for j in range(MAXSIZE)]
-LIST_LEN = 10000  # number of elements in test list
-TEST_SIZE = 10000  # number of elements in test list
-STEP_SIZE = 100
 INCREMENT_LOC = 0.01
-INCREMENT_SUBSEQS = 100
 TYPES = {0: "Pairing", 12: "Smooth"}
 MAX_TYPE_KEY = max(TYPES.keys())
-COLOURS = {0:'xkcd:fire engine red', 12:'xkcd:green'}
-SHADE_COLOURS = {0:'#fe4d4e', 12:'#58ab8e'}
+COLOURS = {0: 'xkcd:fire engine red', 12: 'xkcd:green'}
+SHADE_COLOURS = {0: '#fe4d4e', 12: '#58ab8e'}
 
 
 def isSorted(list0):
@@ -47,7 +41,6 @@ def localizedShuffleByIndex(llist, sdev):
 		tuples += [(key, element)]  # store element with key
 	sortedTuples = sorted(tuples, key=lambda x: x[0])  # sort key-element tuples by keys
 	sortedList = [tup[1] for tup in sortedTuples]  # discard keys
-	# print(sortedList)
 	return sortedList
 
 
@@ -59,7 +52,6 @@ def plot_avg_counts(avgCounts):
 	plt.figure('avg number of operations by heap type')
 	deviations = [fac * INCREMENT_LOC for fac in range(0, math.ceil(0.3 / INCREMENT_LOC), 1)]
 	for k in TYPES.keys():
-		#print(k)
 		avgComps = [acounts[k] for acounts in avgCounts[0]]
 		maxComps = [acounts[k] for acounts in avgCounts[2]]
 		minComps = [acounts[k] for acounts in avgCounts[4]]
@@ -71,12 +63,11 @@ def plot_avg_counts(avgCounts):
 		plt.plot(deviations, avgLinks, color=COLOURS[k], linestyle="--", marker=MARKERS_LINK[k], markerfacecolor=COLOURS[k], markersize=9, markeredgewidth=1, markeredgecolor='black', label=TYPES[k] + " links")
 		plt.fill_between(deviations, minLinks, maxLinks, color=SHADE_COLOURS[k], alpha=.3)
 
-	#plt.title('Sorting random separable permutations', fontsize=25)
 	plt.xlabel('Locality parameter', fontsize=26)
 	plt.ylabel('Avg. number of operations / size', fontsize=26)
 	plt.xticks(fontsize=20)
 	plt.yticks(fontsize=20)
-	plt.rc('legend',fontsize=26) # using a size in points
+	plt.rc('legend', fontsize=26)  # using a size in points
 	plt.legend()
 	plt.grid(True)
 	figure = plt.gcf()  # get current figure
@@ -126,7 +117,6 @@ if __name__ == "__main__":
 	minCompsPerSize = []
 
 	sortedInput = []
-	#testInput = []
 
 	# ----------localised permutation inputs--------------
 	# randomness parameter: standard deviation

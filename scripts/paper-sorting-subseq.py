@@ -23,12 +23,9 @@ from pairing_heap import PairingHeap
 COUNT_TYPE_BOTH = 0
 COUNT_TYPE_LINKS = -1
 COUNT_TYPE_COMPS = -2
-MAXSIZE = 17
 NUMBER_TESTS = 20  # number of tests to run
-TEST_SIZES = [j for j in range(MAXSIZE)]  
 LIST_LEN = 10000  # number of elements in test list
 TEST_SIZE = 10000  # number of elements in test list
-STEP_SIZE = 100
 INCREMENT_SUBSEQS = 100
 TYPES = {0: "Pairing", 12: "Smooth"} 
 MAX_TYPE_KEY = max(TYPES.keys())
@@ -79,7 +76,7 @@ def plot_avg_counts(avgCounts):
 	plt.ylabel('Avg. number of operations / size', fontsize=26)
 	plt.xticks(fontsize=20)
 	plt.yticks(fontsize=20)
-	plt.rc('legend',fontsize=26) # using a size in points
+	plt.rc('legend', fontsize=26)  # using a size in points
 	plt.legend()
 	plt.grid(True)
 	plt.gca().invert_xaxis()
@@ -129,7 +126,6 @@ if __name__ == "__main__":
 	minCompsPerSize = []
 
 	sortedInput = []
-	# testInput = []
 	# ----------continuous sorted subsequences inputs-----
 	# randomness parameter: subsequence lengths
 	params = [fac*INCREMENT_SUBSEQS for fac in range(1, math.ceil((TEST_SIZE/5)/INCREMENT_SUBSEQS), 1)]
@@ -146,7 +142,6 @@ if __name__ == "__main__":
 
 		for zz in range(NUMBER_TESTS):
 			testInput = generateContSortedSubseq(sortedInput, x)
-			#print(len(testInput))
 			for heapType in TYPES.keys():
 				linkCount = 0
 				compCount = 0

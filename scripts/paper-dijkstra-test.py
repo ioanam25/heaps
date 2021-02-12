@@ -25,47 +25,25 @@ COUNT_TYPE_COMPS = -2
 
 TYPES = {21: "Pairing", 22: "Smooth"} 
 MAX_TYPE_KEY = max(TYPES.keys())
-#COLOURS = ['xkcd:fire engine red', 'xkcd:dusty orange', 'xkcd:clear blue', 'xkcd:cool green',
-#           'xkcd:macaroni and cheese', 'xkcd:fire engine red', 'xkcd:dusty orange', 'xkcd:clear blue',
-#           'xkcd:cool green', 'xkcd:macaroni and cheese', 'xkcd:bright sky blue', 'xkcd:bright sky blue', 'xkcd:green',
-#           'xkcd:ochre', 'xkcd:sea blue', 'xkcd:sea green', 'xkcd:sea blue', 'xkcd:warm grey',
-#           'xkcd:bright sky blue', 'xkcd:bright sky blue']
-LINETYPES = 5 * ['-'] + 5 * ['--'] + ['--', '-'] + ['--', '--', '--', '--', '--', '--', '-', '-']
 FIG_LABELS = ["comparisons", "links"]
-MAX_TYPE_KEY = max(TYPES.keys())
 
 COLOURS = {21:'xkcd:fire engine red', 22:'xkcd:sea green'}
-SHADE_COLOURS = {21:'#fe4d4e', 22:'#58ab8e'}
+SHADE_COLOURS = {21: '#fe4d4e', 22: '#58ab8e'}
 
 NUMBER_TESTS = 10  # number of tests to run
-TEST_SIZE = 500  # ,6000,7000,8000,9000,10000,20000,30000,40000,50000,60000,70000,80000,90000,100000
+TEST_SIZE = 500
 EDGE_PROBABILITY = 0.05
 WEIGHT_RANGE = 10000
 
 
-def plot_avg_counts_old(avgCounts):
-    # colours from https://xkcd.com/color/rgb/
-    linetypes = 5 * ["-"] + 5 * ["--"] + ["--", "-"] + ["-, -"]
-    plt.figure('Dijkstra with variable connectivity')
-    for k in TYPES.keys():
-        avgComps = [acounts[k] for acounts in avgCounts[0]]
-        plt.plot([factor * EDGE_PROBABILITY for factor in range(1, 101, 1)], avgComps, color=COLOURS[k], linestyle='-',
-                 label=TYPES[k] + " comparisons")
-        avgLinks = [acounts[k] for acounts in avgCounts[1]]
-        plt.plot([factor * EDGE_PROBABILITY for factor in range(1, 101, 1)], avgLinks, color=COLOURS[k], linestyle='--',
-                 label=TYPES[k] + " links")
-    plt.grid(True)
-    plt.legend(loc='best')
-    plt.show()
-
 def plot_avg_counts(avgCounts):
+    """generates and saves plot of results"""
     # colours from https://xkcd.com/color/rgb/
     MARKERS_COMP = {21:"o", 12:"d", 22:"^"}#https://matplotlib.org/3.1.1/api/markers_api.html
     MARKERS_LINK = {21:"o", 12:"D", 22:"D"}
     plt.figure('avg number of operations in Dijkstra\'s algorithm')
     deviations = [factor * EDGE_PROBABILITY for factor in range(1, 21, 1)]
     for k in TYPES.keys():
-        #print(k)
         avgComps = [acounts[k] for acounts in avgCounts[0]]
         maxComps = [acounts[k] for acounts in avgCounts[2]]
         minComps = [acounts[k] for acounts in avgCounts[4]]
@@ -77,15 +55,13 @@ def plot_avg_counts(avgCounts):
         plt.plot(deviations, avgLinks, color=COLOURS[k], linestyle="--", marker=MARKERS_LINK[k], markerfacecolor=COLOURS[k], markersize=9, markeredgewidth=1, markeredgecolor='black', label=TYPES[k] + " links")
         plt.fill_between(deviations, minLinks, maxLinks, color=SHADE_COLOURS[k], alpha=.3)
 
-
     plt.xlabel('Edge probability', fontsize=26)
     plt.ylabel('Avg. number of operations / size', fontsize=26)
     plt.xticks(fontsize=20)
     plt.yticks(fontsize=20)
-    plt.rc('legend',fontsize=26) # using a size in points
+    plt.rc('legend',fontsize=26)  # using a size in points
     plt.legend()
     plt.grid(True)
-    #plt.gca().invert_xaxis()
     figure = plt.gcf()  # get current figure
     figure.set_size_inches(16, 18)  # set figure's size manually to full screen
     plt.savefig('../plots/paper-dijkstra-new.svg', bbox_inches='tight')  # bbox_inches removes extra white spaces
@@ -143,26 +119,25 @@ if __name__ == "__main__":
 
         for _ in range(NUMBER_TESTS):
             # some nice graph generators here: https://networkx.github.io/documentation/stable/reference/generators.html
+            # initialize input graph
             graph = nx.fast_gnp_random_graph(TEST_SIZE, x)
-            # graph = nx.random_regular_graph(10, 1000)
-            for (u, v) in graph.edges():
+            for (u, v) in graph.edges():  # assign weights
                 graph.edges[u, v]['w'] = random.randint(1, WEIGHT_RANGE)
             for heapType in TYPES.keys():
                 for v in graph.nodes():
-                    graph.nodes[v]['v'] = False # "visited" marker
+                    graph.nodes[v]['v'] = False  # "visited" marker
                 linkCount = 0
                 compCount = 0
-                vertex2qnode = {}
+                vertex2qnode = {}  # mapping graph nodes to heap nodes
                 dist = [888888888 for _ in range(len(graph.nodes()))]
                 prev = [None for _ in range(len(graph.nodes()))]
 
                 heap = PairingHeap(heapType, COUNT_TYPE_BOTH)
                 heap.make_heap()
 
-                source = graph.nodes()[0]
-                dist[0] = 0
+                # Dijkstra's algorithm
+                dist[0] = 0  # start node
                 for idx, v in enumerate(graph.nodes()):
-                    #qnode = Node(dist[idx])
                     qnode = Node(dist[v])
                     qnode.vertex = v
                     vertex2qnode[v] = qnode
@@ -180,24 +155,22 @@ if __name__ == "__main__":
                                                                                                        s))
                     u = minNode.vertex
                     uk = minNode.key
-                    #print(uk)
-                    #print('extracted {}'.format(minNode.key))
-                    graph.nodes[u]['v'] = True #  minNode has been visited
+                    graph.nodes[u]['v'] = True  # minNode has been visited
                     for idx, v in enumerate(graph.neighbors(u)):
                         alt = uk + graph.edges[u, v]['w']
                         if alt < dist[v] and not graph.nodes[v]['v']:
                             (cc, lc) = heap.decrease_key(vertex2qnode[v], dist[v] - alt)
-                            #print('decreased from {} to {}'.format(dist[v],alt))
                             linkCount += lc
                             compCount += cc
                             dist[v] = alt
                             prev[v] = u
+                # track avg. results
                 avgCountsLinks[heapType] += (linkCount / NUMBER_TESTS)/TEST_SIZE
                 avgCountsComps[heapType] += (compCount / NUMBER_TESTS)/TEST_SIZE
-                maxCountsLinks[heapType] = max(maxCountsLinks[heapType],linkCount/TEST_SIZE)
-                maxCountsComps[heapType] = max(maxCountsComps[heapType],compCount/TEST_SIZE)
-                minCountsLinks[heapType] = min(minCountsLinks[heapType],linkCount/TEST_SIZE)
-                minCountsComps[heapType] = min(minCountsComps[heapType],compCount/TEST_SIZE)
+                maxCountsLinks[heapType] = max(maxCountsLinks[heapType], linkCount/TEST_SIZE)
+                maxCountsComps[heapType] = max(maxCountsComps[heapType], compCount/TEST_SIZE)
+                minCountsLinks[heapType] = min(minCountsLinks[heapType], linkCount/TEST_SIZE)
+                minCountsComps[heapType] = min(minCountsComps[heapType], compCount/TEST_SIZE)
 
         for heapType in TYPES.keys():
             pid = os.getpid()
@@ -212,6 +185,6 @@ if __name__ == "__main__":
         maxCompsPerSize += [maxCountsComps]
         minLinksPerSize += [minCountsLinks]
         minCompsPerSize += [minCountsComps]
-    # plot_avg_counts([avgCompsPerSize, avgLinksPerSize])
+
     plot_avg_counts([avgCompsPerSize, avgLinksPerSize, maxCompsPerSize, maxLinksPerSize,  minCompsPerSize, minLinksPerSize])
     export_results(xs, [avgCompsPerSize, avgLinksPerSize], COUNT_TYPE_BOTH, TYPES, "dijkstra")

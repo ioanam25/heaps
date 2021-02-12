@@ -57,12 +57,11 @@ def plot_avg_counts(avgCounts):
 		plt.plot([2**p for p in range(4, MAXSIZE)], avgLinks[3:MAXSIZE-1], color=COLOURS[k], linestyle="--", marker=MARKERS_LINK[k], markerfacecolor=COLOURS[k], markersize=9, markeredgewidth=1, markeredgecolor='black', label=TYPES[k] + " links")
 		plt.fill_between([2**p for p in range(4, MAXSIZE)], minLinks[3:MAXSIZE-1], maxLinks[3:MAXSIZE-1], color=SHADE_COLOURS[k], alpha=.3)
 
-	#plt.title('Sorting random separable permutations', fontsize=25)
 	plt.xlabel('Input size', fontsize=26)
 	plt.ylabel('Avg. number of operations / size', fontsize=26)
 	plt.xticks(fontsize=20)
 	plt.yticks(fontsize=20)
-	plt.rc('legend',fontsize=26) # using a size in points
+	plt.rc('legend', fontsize=26)  # using a size in points
 	plt.legend()
 	plt.grid(True)
 	figure = plt.gcf()  # get current figure
@@ -131,7 +130,6 @@ if __name__ == "__main__":
 	minCompsPerSize = []
 
 	sortedInput = []
-	# testInput = []
 
 	# ----------separable permutation---------------------
 	# parameter: length (must be power of two)
@@ -147,7 +145,6 @@ if __name__ == "__main__":
 		minCountsComps = [1000000000000 for _ in range(MAX_TYPE_KEY + 1)]
 
 		for zz in range(NUMBER_TESTS):
-			testInput = copy.copy(sortedInput)
 			testInput = separablePermutation(x)
 			testInput[0] = -1
 			for heapType in TYPES.keys():

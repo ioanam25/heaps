@@ -8,8 +8,6 @@ from random import shuffle
 import matplotlib.pyplot as plt
 import copy
 import csv
-from node import Node
-from pairing_heap import PairingHeap
 
 import os, sys, inspect
 
@@ -17,17 +15,14 @@ import os, sys, inspect
 current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parent_dir = os.path.dirname(current_dir)
 sys.path.insert(0, parent_dir)
+from node import Node
+from pairing_heap import PairingHeap
+
 COUNT_TYPE_BOTH = 0
 COUNT_TYPE_LINKS = -1
 COUNT_TYPE_COMPS = -2
 MAXSIZE = 18
 NUMBER_TESTS = 5  # number of tests to run
-TEST_SIZES = [j for j in range(MAXSIZE)]  # 
-LIST_LEN = 10000  # number of elements in test list
-TEST_SIZE = 10000  # number of elements in test list
-STEP_SIZE = 100
-INCREMENT_LOC = 0.005
-INCREMENT_SUBSEQS = 100
 TYPES = {0: "Pairing", 12: "Smooth"}
 MAX_TYPE_KEY = max(TYPES.keys())
 COLOURS = {0: 'xkcd:fire engine red', 12: 'xkcd:green'}
