@@ -1,3 +1,43 @@
+/*
+                     Smooth heap implementation
+
+  The "Smooth heap" is a simple and efficient self-adjusting priority queue, 
+  with similarities to the Pairing heap. It supports the operations:
+    * insert        
+    * find_min
+    * delete_min
+    * decrease_key
+    * merge
+    * delete
+  
+  Smooth heaps are described in the papers:
+   * L. Kozma, T. Saranurak: "Smooth heaps and a dual view of self-adjusting
+      data structures" SIAM J. Comput. 49(5) (2020)
+   * M. Hartmann, L. Kozma, C. Sinnamon, R. Tarjan: "Analysis of smooth heaps"
+       (2021)
+
+  This implementation uses a straightforward pointer-structure, loosely 
+  inspired by D. Sleator's implementation of the Splay tree.  It is based on
+  a single multi-ary tree where each node stores a key, according to the 
+  (min-)heap order, so that the key of a non-root node is at least the key
+  of its parent.  Each node has the pointers: left (sibling), right (sibling), 
+  and rightmost (child).  Siblings are linked into a doubly-linked, almost*
+  circular list.
+  (* The only catch is that the left pointer of each leftmost child points back
+  to the parent. This allows us to get away without using parent pointers.)
+
+  Additional data can be stored in the nodes as necessary.
+
+  Compile: gcc smooth_heap.c -lm
+
+  This code was written by L. Kozma <laszlo.kozma@fu-berlin.de> 
+  and is released into the public domain. 
+
+  Version: Feb. 2021.
+
+*/
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #define INT_MIN -2147483648
