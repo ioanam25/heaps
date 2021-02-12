@@ -1,12 +1,19 @@
 #!/usr/bin/python3
+"""Experimental script comparing performance of pairing heap and smooth heap
+as priority queue in Dijkstra's algorithm. Algorithm is run on randomly generated
+Erdös-Renyi graphs of fixed size and variable edge probability.
+Results are stored as .csv files in ../data folder and plots of results in ../plots"""
+
+
+import os, sys, inspect
+# ensuring imports work
+current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parent_dir = os.path.dirname(current_dir)
+sys.path.insert(0, parent_dir)
 from node import Node
-from pairing_heap_interface import PairingHeapInterface
 from pairing_heap import PairingHeap
 import networkx as nx
-import sys
 import random
-import math
-import numpy as np
 import matplotlib.pyplot as plt
 import os
 import psutil
@@ -56,7 +63,7 @@ def plot_avg_counts(avgCounts):
     MARKERS_COMP = {21:"o", 12:"d", 22:"^"}#https://matplotlib.org/3.1.1/api/markers_api.html
     MARKERS_LINK = {21:"o", 12:"D", 22:"D"}
     plt.figure('avg number of operations in Dijkstra\'s algorithm')
-    deviations = [ 10+round(TEST_SIZE*20*factor * EDGE_PROBABILITY) for factor in range(1, 21, 1)]
+    deviations = [factor * EDGE_PROBABILITY for factor in range(1, 21, 1)]
     for k in TYPES.keys():
         #print(k)
         avgComps = [acounts[k] for acounts in avgCounts[0]]
@@ -71,7 +78,7 @@ def plot_avg_counts(avgCounts):
         plt.fill_between(deviations, minLinks, maxLinks, color=SHADE_COLOURS[k], alpha=.3)
 
 
-    plt.xlabel('Graph size', fontsize=26)
+    plt.xlabel('Edge probability', fontsize=26)
     plt.ylabel('Avg. number of operations / size', fontsize=26)
     plt.xticks(fontsize=20)
     plt.yticks(fontsize=20)
@@ -81,22 +88,22 @@ def plot_avg_counts(avgCounts):
     #plt.gca().invert_xaxis()
     figure = plt.gcf()  # get current figure
     figure.set_size_inches(16, 18)  # set figure's size manually to full screen
-    plt.savefig('plots/paper-dijkstra2-new.svg', bbox_inches='tight')  # bbox_inches removes extra white spaces
+    plt.savefig('../plots/paper-dijkstra-new.svg', bbox_inches='tight')  # bbox_inches removes extra white spaces
     plt.legend(loc='best')
     plt.show()
 
 
-def export_results(xs, results, countType, heapTypes, filename="dijkstra2"):
+def export_results(xs, results, countType, heapTypes, filename="dijkstra"):
     # parse data as randomness parameter; counts per heap type
     if countType == COUNT_TYPE_BOTH:
-        with open("data/" + filename + '-comps.csv', 'w', newline='') as csvfile:
+        with open("../data/" + filename + '-comps.csv', 'w', newline='') as csvfile:
             csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])
             csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.keys()])
             for i in range(len(results[0])):
                 row = [xs[i]] + [results[0][i][k] for k in TYPES.keys()]
                 csvwriter.writerow(row)
-        with open("data/" + filename + '-links.csv', 'w', newline='') as csvfile:
+        with open("../data/" + filename + '-links.csv', 'w', newline='') as csvfile:
             csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])
             csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.keys()])
@@ -104,7 +111,7 @@ def export_results(xs, results, countType, heapTypes, filename="dijkstra2"):
                 row = [xs[i]] + [results[1][i][k] for k in TYPES.keys()]
                 csvwriter.writerow(row)
     else:
-        fn = "data/" + filename + '-links.csv' if countType == COUNT_TYPE_LINKS else "data/" + filename + '-comps.csv'
+        fn = "../data/" + filename + '-links.csv' if countType == COUNT_TYPE_LINKS else "../data/" + filename + '-comps.csv'
         with open(fn, 'w', newline='') as csvfile:
             csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])
@@ -136,13 +143,11 @@ if __name__ == "__main__":
 
         for _ in range(NUMBER_TESTS):
             # some nice graph generators here: https://networkx.github.io/documentation/stable/reference/generators.html
-            ##graph = nx.fast_gnp_random_graph(100, 0.1)
-            graph = nx.random_regular_graph(10,10+round(TEST_SIZE*x*20))
-            ##graph = nx.random_regular_graph(10,100)
+            graph = nx.fast_gnp_random_graph(TEST_SIZE, x)
+            # graph = nx.random_regular_graph(10, 1000)
             for (u, v) in graph.edges():
                 graph.edges[u, v]['w'] = random.randint(1, WEIGHT_RANGE)
             for heapType in TYPES.keys():
-                #print('---')
                 for v in graph.nodes():
                     graph.nodes[v]['v'] = False # "visited" marker
                 linkCount = 0
@@ -157,12 +162,11 @@ if __name__ == "__main__":
                 source = graph.nodes()[0]
                 dist[0] = 0
                 for idx, v in enumerate(graph.nodes()):
-#                    qnode = Node(dist[idx])
+                    #qnode = Node(dist[idx])
                     qnode = Node(dist[v])
                     qnode.vertex = v
                     vertex2qnode[v] = qnode
                     (cc, lc) = heap.insert(qnode)
-                    #print('inserted key {}',qnode.key)
                     linkCount += lc
                     compCount += cc
 
@@ -188,13 +192,12 @@ if __name__ == "__main__":
                             compCount += cc
                             dist[v] = alt
                             prev[v] = u
-                TSIZE = 10+round(TEST_SIZE*x*20)
-                avgCountsLinks[heapType] += (linkCount / NUMBER_TESTS)/TSIZE
-                avgCountsComps[heapType] += (compCount / NUMBER_TESTS)/TSIZE
-                maxCountsLinks[heapType] = max(maxCountsLinks[heapType],linkCount/TSIZE)
-                maxCountsComps[heapType] = max(maxCountsComps[heapType],compCount/TSIZE)
-                minCountsLinks[heapType] = min(minCountsLinks[heapType],linkCount/TSIZE)
-                minCountsComps[heapType] = min(minCountsComps[heapType],compCount/TSIZE)
+                avgCountsLinks[heapType] += (linkCount / NUMBER_TESTS)/TEST_SIZE
+                avgCountsComps[heapType] += (compCount / NUMBER_TESTS)/TEST_SIZE
+                maxCountsLinks[heapType] = max(maxCountsLinks[heapType],linkCount/TEST_SIZE)
+                maxCountsComps[heapType] = max(maxCountsComps[heapType],compCount/TEST_SIZE)
+                minCountsLinks[heapType] = min(minCountsLinks[heapType],linkCount/TEST_SIZE)
+                minCountsComps[heapType] = min(minCountsComps[heapType],compCount/TEST_SIZE)
 
         for heapType in TYPES.keys():
             pid = os.getpid()

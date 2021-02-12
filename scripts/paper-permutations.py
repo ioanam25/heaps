@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 import math
 import numpy as np
 
-"""This file generates visualizations of the different random permutation classes"""
+"""This file generates visualizations of the different random permutation classes.
+Resulting plots are stored in ../plots"""
 
 def plot_permutation(permutation, title, filename):
     # visualizing given permutation as element index in permutation over element index in sorted list
@@ -25,7 +26,7 @@ def plot_permutation(permutation, title, filename):
     plt.grid(True)
     figure = plt.gcf()  # get current figure
     figure.set_size_inches(16, 18)  # set figure's size manually to full screen
-    plt.savefig('plots/paper-permutation-{}.svg'.format(filename), bbox_inches='tight')  # bbox_inches removes extra white spaces
+    plt.savefig('../plots/paper-permutation-{}.svg'.format(filename), bbox_inches='tight')  # bbox_inches removes extra white spaces
     plt.legend(loc='best')
     plt.show()
     

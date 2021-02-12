@@ -1,13 +1,20 @@
 #!/usr/bin/python3
-from random import shuffle
-import random
+"""Experimental script comparing performance of pairing heap and smooth heap
+in 'sorting mode': n inserts followed by n delete-min operations.
+Input lists are randomly generated 'localised' permutations of fixed length with variable
+locality parameter.
+Results are stored as .csv files in ../data folder and plots of results in ../plots"""
+
+
 import numpy as np
 import matplotlib.pyplot as plt
-import sys
-import signal
-import copy
 import math
 import csv
+import os, sys, inspect
+# ensuring imports work
+current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parent_dir = os.path.dirname(current_dir)
+sys.path.insert(0, parent_dir)
 from node import Node
 from pairing_heap import PairingHeap
 
@@ -74,24 +81,24 @@ def plot_avg_counts(avgCounts):
 	plt.grid(True)
 	figure = plt.gcf()  # get current figure
 	figure.set_size_inches(16, 18)  # set figure's size manually to your full screen (32x18)
-	plt.savefig('plots/paper-sorting-loc-new.svg', bbox_inches='tight')  # bbox_inches removes extra white spaces
+	plt.savefig('../plots/paper-sorting-loc-new.svg', bbox_inches='tight')  # bbox_inches removes extra white spaces
 	plt.legend(loc='best')
 	plt.show()
 
 
 
 def export_results(params, results, countType, heapTypes, filename="dijkstra"):
-	#  exports results of simulation as separate .csv files, one for links and one for comparisons, into /data directory
+	#  exports results of simulation as separate .csv files, one for links and one for comparisons, into ../data directory
 	#  each row contains randomness parameter value; plus one column containing the number of operations for each heap type
 	if countType == COUNT_TYPE_BOTH:
-		with open("data/" + filename + '-comps.csv', 'w', newline='') as csvfile:
+		with open("../data/" + filename + '-comps.csv', 'w', newline='') as csvfile:
 			csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 			csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])
 			csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.keys()])
 			for i in range(len(results[0])):
 				row = [params[i]] + [results[0][i][k] for k in TYPES.keys()]
 				csvwriter.writerow(row)
-		with open("data/" + filename + '-links.csv', 'w', newline='') as csvfile:
+		with open("../data/" + filename + '-links.csv', 'w', newline='') as csvfile:
 			csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 			csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])
 			csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.keys()])
@@ -99,7 +106,7 @@ def export_results(params, results, countType, heapTypes, filename="dijkstra"):
 				row = [params[i]] + [results[1][i][k] for k in TYPES.keys()]
 				csvwriter.writerow(row)
 	else:
-		fn = "data/" + filename + '-links.csv' if countType == COUNT_TYPE_LINKS else "data/" + filename + '-comps.csv'
+		fn = "../data/" + filename + '-links.csv' if countType == COUNT_TYPE_LINKS else "../data/" + filename + '-comps.csv'
 		with open(fn, 'w', newline='') as csvfile:
 			csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 			csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])

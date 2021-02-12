@@ -1,5 +1,6 @@
 #!/usr/bin/python3
-from node import Node
+"""interface implemented by all heap variants"""
+
 class PairingHeapInterface:
 	def __init__(self):
 		self.count = 0
