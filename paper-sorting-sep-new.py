@@ -29,155 +29,155 @@ SHADE_COLOURS = {0:'#fe4d4e', 12:'#58ab8e'}
 
 
 def isSorted(list0):
-    return all(list0[i] < list0[i + 1] for i in range(len(list0) - 1))
+	return all(list0[i] < list0[i + 1] for i in range(len(list0) - 1))
 
 
 def plot_avg_counts(avgCounts):
-    # colours from https://xkcd.com/color/rgb/
-    MARKERS_COMP = {0:"o", 12:"^"}#https://matplotlib.org/3.1.1/api/markers_api.html
-    MARKERS_LINK = {0:"o", 12:"D"}
+	# colours from https://xkcd.com/color/rgb/
+	MARKERS_COMP = {0:"o", 12:"^"}#https://matplotlib.org/3.1.1/api/markers_api.html
+	MARKERS_LINK = {0:"o", 12:"D"}
 
-    plt.figure('avg number of operations by heap type')
-    for k in TYPES.keys():
-        print(k)
-        avgComps = [acounts[k] for acounts in avgCounts[0]]
-        maxComps = [acounts[k] for acounts in avgCounts[2]]
-        minComps = [acounts[k] for acounts in avgCounts[4]]
-        plt.plot([2**p for p in range(4, MAXSIZE)], avgComps[3:MAXSIZE-1], color=COLOURS[k], linestyle="-", marker=MARKERS_COMP[k], markerfacecolor=COLOURS[k], markersize=9, markeredgewidth=1, markeredgecolor='black', label=TYPES[k] + " comparisons")
-        plt.fill_between([2**p for p in range(4, MAXSIZE)], minComps[3:MAXSIZE-1], maxComps[3:MAXSIZE-1], color=SHADE_COLOURS[k], alpha=.3)
-        avgLinks = [acounts[k] for acounts in avgCounts[1]]
-        maxLinks = [acounts[k] for acounts in avgCounts[3]]
-        minLinks = [acounts[k] for acounts in avgCounts[5]]
-        plt.plot([2**p for p in range(4, MAXSIZE)], avgLinks[3:MAXSIZE-1], color=COLOURS[k], linestyle="--", marker=MARKERS_LINK[k], markerfacecolor=COLOURS[k], markersize=9, markeredgewidth=1, markeredgecolor='black', label=TYPES[k] + " links")
-        plt.fill_between([2**p for p in range(4, MAXSIZE)], minLinks[3:MAXSIZE-1], maxLinks[3:MAXSIZE-1], color=SHADE_COLOURS[k], alpha=.3)
+	plt.figure('avg number of operations by heap type')
+	for k in TYPES.keys():
+		print(k)
+		avgComps = [acounts[k] for acounts in avgCounts[0]]
+		maxComps = [acounts[k] for acounts in avgCounts[2]]
+		minComps = [acounts[k] for acounts in avgCounts[4]]
+		plt.plot([2**p for p in range(4, MAXSIZE)], avgComps[3:MAXSIZE-1], color=COLOURS[k], linestyle="-", marker=MARKERS_COMP[k], markerfacecolor=COLOURS[k], markersize=9, markeredgewidth=1, markeredgecolor='black', label=TYPES[k] + " comparisons")
+		plt.fill_between([2**p for p in range(4, MAXSIZE)], minComps[3:MAXSIZE-1], maxComps[3:MAXSIZE-1], color=SHADE_COLOURS[k], alpha=.3)
+		avgLinks = [acounts[k] for acounts in avgCounts[1]]
+		maxLinks = [acounts[k] for acounts in avgCounts[3]]
+		minLinks = [acounts[k] for acounts in avgCounts[5]]
+		plt.plot([2**p for p in range(4, MAXSIZE)], avgLinks[3:MAXSIZE-1], color=COLOURS[k], linestyle="--", marker=MARKERS_LINK[k], markerfacecolor=COLOURS[k], markersize=9, markeredgewidth=1, markeredgecolor='black', label=TYPES[k] + " links")
+		plt.fill_between([2**p for p in range(4, MAXSIZE)], minLinks[3:MAXSIZE-1], maxLinks[3:MAXSIZE-1], color=SHADE_COLOURS[k], alpha=.3)
 
-    #plt.title('Sorting random separable permutations', fontsize=25)
-    plt.xlabel('Input size', fontsize=26)
-    plt.ylabel('Avg. number of operations / size', fontsize=26)
-    plt.xticks(fontsize=20)
-    plt.yticks(fontsize=20)
-    plt.rc('legend',fontsize=26) # using a size in points
-    plt.legend()
-    plt.grid(True)
-    figure = plt.gcf()  # get current figure
-    figure.set_size_inches(16, 18)  # set figure's size manually to full screen
-    plt.savefig('plots/paper-sorting-sep-new.svg', bbox_inches='tight')  # bbox_inches removes extra white spaces
-    plt.legend(loc='best')
-    plt.show()
+	#plt.title('Sorting random separable permutations', fontsize=25)
+	plt.xlabel('Input size', fontsize=26)
+	plt.ylabel('Avg. number of operations / size', fontsize=26)
+	plt.xticks(fontsize=20)
+	plt.yticks(fontsize=20)
+	plt.rc('legend',fontsize=26) # using a size in points
+	plt.legend()
+	plt.grid(True)
+	figure = plt.gcf()  # get current figure
+	figure.set_size_inches(16, 18)  # set figure's size manually to full screen
+	plt.savefig('plots/paper-sorting-sep-new.svg', bbox_inches='tight')  # bbox_inches removes extra white spaces
+	plt.legend(loc='best')
+	plt.show()
 
 
 def export_results(params, results, countType, heapTypes, filename="dijkstra"):
-    #  exports results of simulation as separate .csv files, one for links and one for comparisons, into /data directory
-    #  each row contains randomness parameter value; plus one column containing the number of operations for each heap type
-    if countType == COUNT_TYPE_BOTH:
-        with open("data/" + filename + '-comps.csv', 'w', newline='') as csvfile:
-            csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-            csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])
-            csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.keys()])
-            for i in range(len(results[0])):
-                row = [params[i]] + [results[0][i][k] for k in TYPES.keys()]
-                csvwriter.writerow(row)
-        with open("data/" + filename + '-links.csv', 'w', newline='') as csvfile:
-            csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-            csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])
-            csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.keys()])
-            for i in range(len(results[1])):
-                row = [params[i]] + [results[1][i][k] for k in TYPES.keys()]
-                csvwriter.writerow(row)
-    else:
-        fn = "data/" + filename + '-links.csv' if countType == COUNT_TYPE_LINKS else "data/" + filename + '-comps.csv'
-        with open(fn, 'w', newline='') as csvfile:
-            csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-            csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])
-            csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.keys()])
-            for i in range(len(results)):
-                row = [params[i]] + [results[i][k] for k in TYPES.keys()]
-                csvwriter.writerow(row)
+	#  exports results of simulation as separate .csv files, one for links and one for comparisons, into /data directory
+	#  each row contains randomness parameter value; plus one column containing the number of operations for each heap type
+	if countType == COUNT_TYPE_BOTH:
+		with open("data/" + filename + '-comps.csv', 'w', newline='') as csvfile:
+			csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+			csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])
+			csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.keys()])
+			for i in range(len(results[0])):
+				row = [params[i]] + [results[0][i][k] for k in TYPES.keys()]
+				csvwriter.writerow(row)
+		with open("data/" + filename + '-links.csv', 'w', newline='') as csvfile:
+			csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+			csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])
+			csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.keys()])
+			for i in range(len(results[1])):
+				row = [params[i]] + [results[1][i][k] for k in TYPES.keys()]
+				csvwriter.writerow(row)
+	else:
+		fn = "data/" + filename + '-links.csv' if countType == COUNT_TYPE_LINKS else "data/" + filename + '-comps.csv'
+		with open(fn, 'w', newline='') as csvfile:
+			csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+			csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])
+			csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.keys()])
+			for i in range(len(results)):
+				row = [params[i]] + [results[i][k] for k in TYPES.keys()]
+				csvwriter.writerow(row)
 
 
 def separablePermutation(n):
-    assert (n & (n - 1) == 0) and n != 0 and n > 1, "n must be a power of two > 1"  # bit magic
+	assert (n & (n - 1) == 0) and n != 0 and n > 1, "n must be a power of two > 1"  # bit magic
 
-    def generateSepPermutation(l, r):
-        flip = random.random() >= 0.5
-        if r - l == 1:
-            if flip == 0:
-                return [r, l]
-            else:
-                return [l, r]
-        else:
-            m = math.floor((l + r) / 2)
-            if flip == 0:
-                return generateSepPermutation(m + 1, r) + generateSepPermutation(l, m)
-            else:
-                return generateSepPermutation(l, m) + generateSepPermutation(m + 1, r)
+	def generateSepPermutation(l, r):
+		flip = random.random() >= 0.5
+		if r - l == 1:
+			if flip == 0:
+				return [r, l]
+			else:
+				return [l, r]
+		else:
+			m = math.floor((l + r) / 2)
+			if flip == 0:
+				return generateSepPermutation(m + 1, r) + generateSepPermutation(l, m)
+			else:
+				return generateSepPermutation(l, m) + generateSepPermutation(m + 1, r)
 
-    return generateSepPermutation(0, n - 1)
+	return generateSepPermutation(0, n - 1)
 
 
 if __name__ == "__main__":
-    testOutputCount = []
-    avgLinksPerSize = []
-    avgCompsPerSize = []
-    maxLinksPerSize = []
-    maxCompsPerSize = []
-    minLinksPerSize = []
-    minCompsPerSize = []
+	testOutputCount = []
+	avgLinksPerSize = []
+	avgCompsPerSize = []
+	maxLinksPerSize = []
+	maxCompsPerSize = []
+	minLinksPerSize = []
+	minCompsPerSize = []
 
-    sortedInput = []
-    # testInput = []
+	sortedInput = []
+	# testInput = []
 
-    # ----------separable permutation---------------------
-    # parameter: length (must be power of two)
-    params = [2**p for p in range(1, MAXSIZE)]
+	# ----------separable permutation---------------------
+	# parameter: length (must be power of two)
+	params = [2**p for p in range(1, MAXSIZE)]
 
-    for x in params:
-        sortedInput = [k for k in range(x)]
-        avgCountsLinks = [0 for _ in range(MAX_TYPE_KEY + 1)]
-        avgCountsComps = [0 for _ in range(MAX_TYPE_KEY + 1)]
-        maxCountsLinks = [0 for _ in range(MAX_TYPE_KEY + 1)]
-        maxCountsComps = [0 for _ in range(MAX_TYPE_KEY + 1)]
-        minCountsLinks = [1000000000000 for _ in range(MAX_TYPE_KEY + 1)]
-        minCountsComps = [1000000000000 for _ in range(MAX_TYPE_KEY + 1)]
+	for x in params:
+		sortedInput = [k for k in range(x)]
+		avgCountsLinks = [0 for _ in range(MAX_TYPE_KEY + 1)]
+		avgCountsComps = [0 for _ in range(MAX_TYPE_KEY + 1)]
+		maxCountsLinks = [0 for _ in range(MAX_TYPE_KEY + 1)]
+		maxCountsComps = [0 for _ in range(MAX_TYPE_KEY + 1)]
+		minCountsLinks = [1000000000000 for _ in range(MAX_TYPE_KEY + 1)]
+		minCountsComps = [1000000000000 for _ in range(MAX_TYPE_KEY + 1)]
 
-        for zz in range(NUMBER_TESTS):
-            testInput = copy.copy(sortedInput)
-            testInput = separablePermutation(x)
-            testInput[0] = -1
-            for heapType in TYPES.keys():
-                linkCount = 0
-                compCount = 0
-                testOutput = []
-                heap = PairingHeap(heapType, COUNT_TYPE_BOTH)
-                heap.make_heap()
-                for element in testInput:
-                    node = Node(element)
-                    (cc, lc) = heap.insert(node)
-                for i in range(len(testInput)):
-                    (minNode, cc, lc) = heap.delete_min()
-                    testOutput += [minNode.key]
-                    compCount += cc
-                    linkCount += lc
-                if isSorted(testOutput):  # sanity check
-			        #divide by size for visualization
-                    avgCountsLinks[heapType] += (linkCount/x) / NUMBER_TESTS
-                    avgCountsComps[heapType] += (compCount/x) / NUMBER_TESTS
-                    maxCountsLinks[heapType] = max(maxCountsLinks[heapType],linkCount/x)
-                    maxCountsComps[heapType] = max(maxCountsComps[heapType],compCount/x)
-                    minCountsLinks[heapType] = min(minCountsLinks[heapType],linkCount/x)
-                    minCountsComps[heapType] = min(minCountsComps[heapType],compCount/x)
-                else:
-                    raise Exception("Invalid result for {}".format(TYPES[heapType]))
-                print("[{}: {}, {}/{}] \t Links: {} \t Comps: {}".format(
-                    TYPES[heapType], x, zz+1, NUMBER_TESTS, linkCount, compCount))
-        for heapType in TYPES.keys():
-            print("[{}: {}, avg] \t Links: {} \t Comps: {}".format(TYPES[heapType], x, avgCountsLinks[heapType], avgCountsComps[heapType]))
-        avgLinksPerSize += [avgCountsLinks]
-        avgCompsPerSize += [avgCountsComps]
-        maxLinksPerSize += [maxCountsLinks]
-        maxCompsPerSize += [maxCountsComps]
-        minLinksPerSize += [minCountsLinks]
-        minCompsPerSize += [minCountsComps]
-    plot_avg_counts([avgCompsPerSize, avgLinksPerSize, maxCompsPerSize, maxLinksPerSize, minCompsPerSize, minLinksPerSize])
-    export_results(params, [avgCompsPerSize, avgLinksPerSize], COUNT_TYPE_BOTH, TYPES, "sorting-sep-new")
+		for zz in range(NUMBER_TESTS):
+			testInput = copy.copy(sortedInput)
+			testInput = separablePermutation(x)
+			testInput[0] = -1
+			for heapType in TYPES.keys():
+				linkCount = 0
+				compCount = 0
+				testOutput = []
+				heap = PairingHeap(heapType, COUNT_TYPE_BOTH)
+				heap.make_heap()
+				for element in testInput:
+					node = Node(element)
+					(cc, lc) = heap.insert(node)
+				for i in range(len(testInput)):
+					(minNode, cc, lc) = heap.delete_min()
+					testOutput += [minNode.key]
+					compCount += cc
+					linkCount += lc
+				if isSorted(testOutput):  # sanity check
+					#divide by size for visualization
+					avgCountsLinks[heapType] += (linkCount/x) / NUMBER_TESTS
+					avgCountsComps[heapType] += (compCount/x) / NUMBER_TESTS
+					maxCountsLinks[heapType] = max(maxCountsLinks[heapType],linkCount/x)
+					maxCountsComps[heapType] = max(maxCountsComps[heapType],compCount/x)
+					minCountsLinks[heapType] = min(minCountsLinks[heapType],linkCount/x)
+					minCountsComps[heapType] = min(minCountsComps[heapType],compCount/x)
+				else:
+					raise Exception("Invalid result for {}".format(TYPES[heapType]))
+				print("[{}: {}, {}/{}] \t Links: {} \t Comps: {}".format(
+					TYPES[heapType], x, zz+1, NUMBER_TESTS, linkCount, compCount))
+		for heapType in TYPES.keys():
+			print("[{}: {}, avg] \t Links: {} \t Comps: {}".format(TYPES[heapType], x, avgCountsLinks[heapType], avgCountsComps[heapType]))
+		avgLinksPerSize += [avgCountsLinks]
+		avgCompsPerSize += [avgCountsComps]
+		maxLinksPerSize += [maxCountsLinks]
+		maxCompsPerSize += [maxCountsComps]
+		minLinksPerSize += [minCountsLinks]
+		minCompsPerSize += [minCountsComps]
+	plot_avg_counts([avgCompsPerSize, avgLinksPerSize, maxCompsPerSize, maxLinksPerSize, minCompsPerSize, minLinksPerSize])
+	export_results(params, [avgCompsPerSize, avgLinksPerSize], COUNT_TYPE_BOTH, TYPES, "sorting-sep-new")
 

@@ -20,7 +20,7 @@ class PairingHeap(PairingHeapInterface):
 		self.countType=countType
 
 	def make_heap(self):
-	    if self.mode==0:
+		if self.mode==0:
 			self.heap=PairingHeapStandard()
 		elif self.mode==12:
 			self.heap=SmoothHeap()

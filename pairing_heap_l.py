@@ -3,7 +3,7 @@ from node import Node
 from pairing_heap_interface import PairingHeapInterface
 
 class PairingHeapL(PairingHeapInterface):
-    #  lazy variant of standard pairing heap (maintaining root-list and consolidating only upon extract-min)
+	#  lazy variant of standard pairing heap (maintaining root-list and consolidating only upon extract-min)
 	forest=[] #list storing roots of all top-level trees
 	def __init__(self, root=None):
 		self.forest=[]

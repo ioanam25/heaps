@@ -3,7 +3,7 @@ from node import Node
 import math
 from pairing_heap_interface import PairingHeapInterface
 
-class SmoothHeapCorey(PairingHeapInterface):
+class SmoothHeap(PairingHeapInterface):
 	forest=[] #list storing roots of all top-level trees not in buffer
 	buffer=[] #decrease buffer
 	minNode=None
@@ -101,7 +101,7 @@ class SmoothHeapCorey(PairingHeapInterface):
 			self.buffer=heap2.buffer
 		self.size+=heap2.size
 		if(self.minNode.key>=heap2.minNode.key):
- 			self.minNode=heap2.minNode
+			self.minNode=heap2.minNode
 		return (compCount, linkCount)
 
 	def delete_min(self):
@@ -187,7 +187,7 @@ class SmoothHeapCorey(PairingHeapInterface):
 			self.minNode=self.forest[0]
 		return (compCount, linkCount)
 		
-        
+
 	def mergesort(self, llist):
 		#standard mergesort, implemented to count comparisons properly
 		if len(llist)<2:
@@ -222,7 +222,7 @@ class SmoothHeapCorey(PairingHeapInterface):
 
 		treapified = self.buffer[0]
 		self.buffer=[]
-		(compCount,linkCount)=self.merge(SmoothHeapCorey(treapified))
+		(compCount,linkCount)=self.merge(SmoothHeap(treapified))
 		
 		return (compCount+comps, linkCount+n-1) #(n-1)links while consolidating
 
@@ -246,7 +246,7 @@ class SmoothHeapCorey(PairingHeapInterface):
 			else:
 				self.listPreOrder()
 				raise Exception("node with key {} is not in heap".format(node.key))
-            
+
 		elif node.parent==None: #node is a root and has children
 			leftChild=node.rightChild.nextSibling
 			if leftChild.nextSibling!=leftChild:
