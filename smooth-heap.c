@@ -28,7 +28,7 @@
 
   Additional data can be stored in the nodes as necessary.
 
-  Compile: gcc smooth_heap.c -lm
+  Compile: gcc smooth-heap.c -lm
 
   This code was written by L. Kozma <laszlo.kozma@fu-berlin.de> 
   and is released into the public domain. 
