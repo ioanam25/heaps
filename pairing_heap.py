@@ -8,6 +8,8 @@ from pairing_heap_standard import PairingHeapStandard
 from smooth_heap import SmoothHeap
 from pairing_heap_l import PairingHeapL
 from smooth_heap_l import SmoothHeapL
+from slim_heap_l import SlimHeapL
+from slim_heap import SlimHeap
 
 COUNT_TYPE_LINKS=-1
 COUNT_TYPE_COMPS=-2
@@ -15,7 +17,7 @@ COUNT_TYPE_BOTH=0
 
 
 class PairingHeap(PairingHeapInterface):
-	MODES = {21: "Pairing_L", 22: "Smooth_L"}
+	MODES = {21: "Pairing_L", 22: "Smooth_L", 23: "Slim_L", 24: "Slim"}
 	mode = 0
 	countType = COUNT_TYPE_COMPS
 	heap = None
@@ -33,6 +35,10 @@ class PairingHeap(PairingHeapInterface):
 			self.heap = PairingHeapL()
 		elif self.mode == 22:  # root list version, everything lazy, to be used for Dijkstra test in paper
 			self.heap = SmoothHeapL()
+		elif self.mode == 23:
+			self.heap = SlimHeapL()  # root list version, everything lazy, to be used for Dijkstra test in paper
+		elif self.mode == 24:
+			self.heap = SlimHeap()
 		else:
 			raise Exception("Invalid heap ID! No heap of type ID {} is implemented.")
 	

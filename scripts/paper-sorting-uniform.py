@@ -23,10 +23,10 @@ COUNT_TYPE_LINKS = -1
 COUNT_TYPE_COMPS = -2
 MAXSIZE = 18
 NUMBER_TESTS = 5  # number of tests to run
-TYPES = {0: "Pairing", 12: "Smooth"}
+TYPES = {0: "Pairing", 12: "Smooth", 24:"Slim"}
 MAX_TYPE_KEY = max(TYPES.keys())
-COLOURS = {0: 'xkcd:fire engine red', 12: 'xkcd:green'}
-SHADE_COLOURS = {0: '#fe4d4e', 12: '#58ab8e'}
+COLOURS = {0: 'xkcd:fire engine red', 12:'xkcd:sea green', 24:'xkcd:electric blue'}
+SHADE_COLOURS = {0: 'xkcd:fire engine red', 12:'xkcd:sea green', 24:'xkcd:electric blue'}
 
 
 def isSorted(list0):
@@ -35,8 +35,8 @@ def isSorted(list0):
 
 def plot_avg_counts_uni(avgCounts):
     # colours from https://xkcd.com/color/rgb/
-    MARKERS_COMP = {0: "o", 12: "^"}  # https://matplotlib.org/3.1.1/api/markers_api.html
-    MARKERS_LINK = {0: "o", 12: "D"}
+    MARKERS_COMP = {0: "o", 12: "^", 24:"p"}  # https://matplotlib.org/3.1.1/api/markers_api.html
+    MARKERS_LINK = {0: "o", 12: "D", 24:"X"}
     plt.figure('avg number of operations by heap type')
     for k in TYPES.keys():
         avgComps = [acounts[k] for acounts in avgCounts[0]]
@@ -57,11 +57,11 @@ def plot_avg_counts_uni(avgCounts):
                          color=SHADE_COLOURS[k], alpha=.3)
 
     # plt.title('Sorting random permutations', fontsize=25)
-    plt.xlabel('Input size', fontsize=26)
-    plt.ylabel('Avg. number of operations / size', fontsize=26)
-    plt.xticks(fontsize=20)
-    plt.yticks(fontsize=20)
-    plt.rc('legend', fontsize=26)  # using a size in points
+    plt.xlabel('Input size', fontsize=39)
+    plt.ylabel('Avg. number of operations / size', fontsize=39)
+    plt.xticks(fontsize=30)
+    plt.yticks(fontsize=30)
+    plt.rc('legend', fontsize=30)  # using a size in points
     plt.legend()
     plt.grid(True)
     figure = plt.gcf()  # get current figure
@@ -71,7 +71,7 @@ def plot_avg_counts_uni(avgCounts):
     plt.show()
 
 
-def export_results(params, results, countType, heapTypes, filename="dijkstra"):
+def export_results(params, results, countType, heapTypes, filename="sorting-uniform"):
     # parse data as randomness parameter; counts per heap type
     if countType == COUNT_TYPE_BOTH:
         with open("../data/" + filename + '-comps.csv', 'w', newline='') as csvfile:

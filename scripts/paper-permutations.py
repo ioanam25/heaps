@@ -8,7 +8,7 @@ import numpy as np
 """This file generates visualizations of the different random permutation classes.
 Resulting plots are stored in ../plots"""
 
-def plot_permutation(permutation, title, filename):
+def plot_permutation(permutation, title, filename, show_legend=True):
     # visualizing given permutation as element index in permutation over element index in sorted list
     # colours from https://xkcd.com/color/rgb/
     plt.figure(title)
@@ -17,12 +17,15 @@ def plot_permutation(permutation, title, filename):
     indices = [i for i in range(len(sortedList))]
     pindices = [permutation.index(x) for x in sortedList]
     plt.plot(indices, pindices, color='xkcd:charcoal', marker='o', linestyle="", label="(sorted index, permuted index)")
-    plt.xlabel('Index in sorted list', fontsize=26)
-    plt.ylabel('Index in permutation', fontsize=26)
-    plt.xticks(fontsize=20)
-    plt.yticks(fontsize=20)
-    plt.rc('legend',fontsize=26) # using a size in points
-    plt.legend()
+    plt.xlabel('Index in sorted list', fontsize=39)
+    plt.xticks(fontsize=30)
+    if show_legend:
+        plt.ylabel('Index in permutation', fontsize=39)
+        plt.yticks(fontsize=30)
+        plt.rc('legend',fontsize=30) # using a size in points
+        plt.legend()
+    else:
+        plt.gca().axes.yaxis.set_ticklabels([])
     plt.grid(True)
     figure = plt.gcf()  # get current figure
     figure.set_size_inches(16, 18)  # set figure's size manually to full screen
@@ -82,11 +85,11 @@ random.shuffle(randomPermutation)
 plot_permutation(randomPermutation, "Uniformly Random Permutation", "uniform")
 #  generating random separable permutation
 separablePermutation = separablePermutation(512)
-plot_permutation(separablePermutation, "Random Separable Permutation", "separable")
+plot_permutation(separablePermutation, "Random Separable Permutation", "separable", False)
 #  generating random localized permutation
 localizedPermutation = localizedShuffleByIndex(sortedList, 0.15)
-plot_permutation(localizedPermutation, "Random Localized Permutation", "localized")
+plot_permutation(localizedPermutation, "Random Localized Permutation", "localized", False)
 #  generating random permutation with continuous sorted subsequences
 subseqPermutation = generateContSortedSubseq(sortedList, 30)
-plot_permutation(subseqPermutation, "Random Subsequence Permutation", "subseq")
+plot_permutation(subseqPermutation, "Random Subsequence Permutation", "subseq", False)
 

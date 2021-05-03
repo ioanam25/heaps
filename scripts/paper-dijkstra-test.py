@@ -23,12 +23,12 @@ COUNT_TYPE_BOTH = 0
 COUNT_TYPE_LINKS = -1
 COUNT_TYPE_COMPS = -2
 
-TYPES = {21: "Pairing", 22: "Smooth"} 
+TYPES = {21: "Pairing", 22: "Smooth", 23: "Slim"} 
 MAX_TYPE_KEY = max(TYPES.keys())
 FIG_LABELS = ["comparisons", "links"]
 
-COLOURS = {21:'xkcd:fire engine red', 22:'xkcd:sea green'}
-SHADE_COLOURS = {21: '#fe4d4e', 22: '#58ab8e'}
+COLOURS = {21:'xkcd:fire engine red', 22:'xkcd:sea green', 23:'xkcd:electric blue'}
+SHADE_COLOURS = {21:'xkcd:fire engine red', 22:'xkcd:sea green', 23:'xkcd:electric blue'}
 
 NUMBER_TESTS = 10  # number of tests to run
 TEST_SIZE = 500
@@ -39,8 +39,8 @@ WEIGHT_RANGE = 10000
 def plot_avg_counts(avgCounts):
     """generates and saves plot of results"""
     # colours from https://xkcd.com/color/rgb/
-    MARKERS_COMP = {21:"o", 12:"d", 22:"^"}#https://matplotlib.org/3.1.1/api/markers_api.html
-    MARKERS_LINK = {21:"o", 12:"D", 22:"D"}
+    MARKERS_COMP = {21:"o", 12:"d", 22:"^", 23:"p"}#https://matplotlib.org/3.1.1/api/markers_api.html
+    MARKERS_LINK = {21:"o", 12:"D", 22:"D", 23: "X"}
     plt.figure('avg number of operations in Dijkstra\'s algorithm')
     deviations = [factor * EDGE_PROBABILITY for factor in range(1, 21, 1)]
     for k in TYPES.keys():
@@ -55,11 +55,11 @@ def plot_avg_counts(avgCounts):
         plt.plot(deviations, avgLinks, color=COLOURS[k], linestyle="--", marker=MARKERS_LINK[k], markerfacecolor=COLOURS[k], markersize=9, markeredgewidth=1, markeredgecolor='black', label=TYPES[k] + " links")
         plt.fill_between(deviations, minLinks, maxLinks, color=SHADE_COLOURS[k], alpha=.3)
 
-    plt.xlabel('Edge probability', fontsize=26)
-    plt.ylabel('Avg. number of operations / size', fontsize=26)
-    plt.xticks(fontsize=20)
-    plt.yticks(fontsize=20)
-    plt.rc('legend',fontsize=26)  # using a size in points
+    plt.xlabel('Edge probability', fontsize=39)
+    plt.ylabel('Avg. number of operations / size', fontsize=39)
+    plt.xticks(fontsize=30)
+    plt.yticks(fontsize=30)
+    plt.rc('legend',fontsize=30)  # using a size in points
     plt.legend()
     plt.grid(True)
     figure = plt.gcf()  # get current figure

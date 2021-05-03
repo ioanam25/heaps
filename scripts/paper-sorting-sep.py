@@ -28,10 +28,10 @@ TEST_SIZE = 10000  # number of elements in test list
 STEP_SIZE = 100
 INCREMENT_LOC = 0.005
 INCREMENT_SUBSEQS = 100
-TYPES = {0: "Pairing", 12: "Smooth"}
+TYPES = {0: "Pairing", 12: "Smooth", 24: "Slim"}
 MAX_TYPE_KEY = max(TYPES.keys())
-COLOURS = {0:'xkcd:fire engine red', 12:'xkcd:green'}
-SHADE_COLOURS = {0:'#fe4d4e', 12:'#58ab8e'}
+COLOURS = {0: 'xkcd:fire engine red', 12:'xkcd:sea green', 24:'xkcd:electric blue'}
+SHADE_COLOURS = {0: 'xkcd:fire engine red', 12:'xkcd:sea green', 24:'xkcd:electric blue'}
 
 
 def isSorted(list0):
@@ -40,8 +40,8 @@ def isSorted(list0):
 
 def plot_avg_counts(avgCounts):
 	# colours from https://xkcd.com/color/rgb/
-	MARKERS_COMP = {0:"o", 12:"^"}#https://matplotlib.org/3.1.1/api/markers_api.html
-	MARKERS_LINK = {0:"o", 12:"D"}
+	MARKERS_COMP = {0:"o", 12:"^", 24: "p"}#https://matplotlib.org/3.1.1/api/markers_api.html
+	MARKERS_LINK = {0:"o", 12:"D", 24: "X"}
 
 	plt.figure('avg number of operations by heap type')
 	for k in TYPES.keys():
@@ -57,12 +57,12 @@ def plot_avg_counts(avgCounts):
 		plt.plot([2**p for p in range(4, MAXSIZE)], avgLinks[3:MAXSIZE-1], color=COLOURS[k], linestyle="--", marker=MARKERS_LINK[k], markerfacecolor=COLOURS[k], markersize=9, markeredgewidth=1, markeredgecolor='black', label=TYPES[k] + " links")
 		plt.fill_between([2**p for p in range(4, MAXSIZE)], minLinks[3:MAXSIZE-1], maxLinks[3:MAXSIZE-1], color=SHADE_COLOURS[k], alpha=.3)
 
-	plt.xlabel('Input size', fontsize=26)
-	plt.ylabel('Avg. number of operations / size', fontsize=26)
-	plt.xticks(fontsize=20)
-	plt.yticks(fontsize=20)
-	plt.rc('legend', fontsize=26)  # using a size in points
-	plt.legend()
+	plt.xlabel('Input size', fontsize=39)
+	#plt.ylabel('Avg. number of operations / size', fontsize=39)
+	plt.xticks(fontsize=30)
+	plt.yticks(fontsize=30)
+	#plt.rc('legend', fontsize=39)  # using a size in points
+	#plt.legend()
 	plt.grid(True)
 	figure = plt.gcf()  # get current figure
 	figure.set_size_inches(16, 18)  # set figure's size manually to full screen
@@ -71,7 +71,7 @@ def plot_avg_counts(avgCounts):
 	plt.show()
 
 
-def export_results(params, results, countType, heapTypes, filename="dijkstra"):
+def export_results(params, results, countType, heapTypes, filename="sorting-sep"):
 	#  exports results of simulation as separate .csv files, one for links and one for comparisons, into ../data directory
 	#  each row contains randomness parameter value; plus one column containing the number of operations for each heap type
 	if countType == COUNT_TYPE_BOTH:
