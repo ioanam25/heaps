@@ -1,8 +1,9 @@
 /*
-                     Smooth heap implementation
+                     Slim heap implementation
 
-  The "Smooth heap" is a simple and efficient self-adjusting priority queue, 
-  with similarities to the Pairing heap. It supports the operations:
+  The "Slim heap" is a variant of the "Smooth heap". Both are simple and efficient 
+  self-adjusting priority queues, with similarities to the Pairing heap. 
+  The supported operations are:
     * insert        
     * find_min
     * delete_min
@@ -29,7 +30,7 @@
 
   Additional data can be stored in the nodes as necessary.
 
-  Compile: gcc smooth-heap.c -lm
+  Compile: gcc slim-heap.c -lm
 
   This code was written by L. Kozma <laszlo.kozma@fu-berlin.de> 
   and is released into the public domain. 
@@ -117,11 +118,9 @@ Heap * insert(int i, Heap * h) {
 
 /*  Link heaps parent and child, assuming both exist. 
     Return a pointer to the resulting heap. 
-    link1 assumes parent was left sibling of child. 
-    link2 assumes parent was right sibling of child. 
     This is also the linking primitive used by other operations.  */
  
-Heap * link1(Heap * parent, Heap * child) {
+Heap * link(Heap * parent, Heap * child) {
 
     Heap * rm;
     rm = parent->rightmost;
@@ -137,22 +136,6 @@ Heap * link1(Heap * parent, Heap * child) {
     return parent;
 }
 
-Heap * link2(Heap * parent, Heap * child) {
-
-    Heap * rm;
-    rm = parent->rightmost;
-    child->left = parent;
-    if (!rm) {
-        child->right = child;
-        parent->rightmost = child;
-    } else {
-        child->right = rm->right;
-        rm->right->left = child;
-        rm->right = child;
-    }
-    return parent;
-}
-
 
 /*  Merge heaps h1 and h2. Return a pointer to the resulting heap. 
     Also used by some other operations. */
@@ -160,7 +143,6 @@ Heap * link2(Heap * parent, Heap * child) {
 Heap * merge(Heap * h1, Heap * h2) {
 
     Heap * rm, * parent, * child;
-    int lr = 0;
     if (!h1)  
         return h2;
     if (!h2 || h1 == h2)
@@ -168,16 +150,12 @@ Heap * merge(Heap * h1, Heap * h2) {
     if (h1->key < h2->key) {
         parent = h1;
         child = h2;
-        lr = 1;
     } else {
         parent = h2;
         child = h1;
     }
-
-    if (lr) 
-        link1(parent, child);
-    else
-        link2(parent, child);
+    parent = link(parent, child);
+    return parent;
 }
 
 
@@ -242,7 +220,7 @@ Heap * decrease_key(Heap * n, Heap * h, int k) {
 
 
 /*  Delete the minimum-key node (i.e. the root) of heap h. 
-    This is where the restructuring specific to smooth heaps happens.
+    This is where the restructuring specific to slim heaps happens.
     Return a pointer to the resulting heap after restructuring.  */
 
 Heap * delete_min(Heap * h) {
@@ -266,20 +244,20 @@ Heap * delete_min(Heap * h) {
         else {                                      /*  x is a local max  */
             while ((x->left) && (x->left->key > x->right->key)) { /*  link left  */
                 tr = x->right;
-                x = link1(x->left, x);
+                x = link(x->left, x);
                 tr->left = x;
                 x->right = tr;
             }
             tl = x->left;                                         /*  link right  */
             tr = x->right->right;
-            x = link2(x->right, x); 
+            x = link(x->right, x); 
             if (tl)
                 tl->right = x;
             x->left = tl; 
         }    
     }
     while (x->left) {                               /*  right-to-left phase  */
-        x = link1(x->left, x);
+        x = link(x->left, x);
     }
     x->left = x->right = x;
     free(h);
@@ -353,9 +331,11 @@ void main() {
     print(heap3);
     printf("#\n");
 
+
     heap3 = delete(temp, heap3);
     print(heap3);
     printf("#\n");
+   
 
     heap4 = NULL;             
     for (i=1;i<10000;i++) {
@@ -372,6 +352,5 @@ void main() {
         //printf("%d.%d\n", i, heap4->key);
         heap4 = delete_min(heap4);
     }
-
 
 }
