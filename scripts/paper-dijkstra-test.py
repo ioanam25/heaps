@@ -23,12 +23,12 @@ COUNT_TYPE_BOTH = 0
 COUNT_TYPE_LINKS = -1
 COUNT_TYPE_COMPS = -2
 
-TYPES = {21: "Pairing", 22: "Smooth", 23: "Slim"} 
+TYPES = {21: "Pairing", 22: "Smooth", 23: "Slim", 25: "Pairing Lazy"}
 MAX_TYPE_KEY = max(TYPES.keys())
 FIG_LABELS = ["comparisons", "links"]
 
-COLOURS = {21:'xkcd:fire engine red', 22:'xkcd:sea green', 23:'xkcd:electric blue'}
-SHADE_COLOURS = {21:'xkcd:fire engine red', 22:'xkcd:sea green', 23:'xkcd:electric blue'}
+COLOURS = {21:'xkcd:fire engine red', 22:'xkcd:sea green', 23:'xkcd:electric blue', 25:"xkcd:mauve"}
+SHADE_COLOURS = {21:'xkcd:fire engine red', 22:'xkcd:sea green', 23:'xkcd:electric blue', 25:"xkcd:mauve"}
 
 NUMBER_TESTS = 10  # number of tests to run
 TEST_SIZE = 500
@@ -39,8 +39,8 @@ WEIGHT_RANGE = 10000
 def plot_avg_counts(avgCounts):
     """generates and saves plot of results"""
     # colours from https://xkcd.com/color/rgb/
-    MARKERS_COMP = {21:"o", 12:"d", 22:"^", 23:"p"}#https://matplotlib.org/3.1.1/api/markers_api.html
-    MARKERS_LINK = {21:"o", 12:"D", 22:"D", 23: "X"}
+    MARKERS_COMP = {21:"o", 12:"d", 22:"^", 23:"p", 25:"s"}#https://matplotlib.org/3.1.1/api/markers_api.html
+    MARKERS_LINK = {21:"o", 12:"D", 22:"D", 23: "X", 25: "*"}
     plt.figure('avg number of operations in Dijkstra\'s algorithm')
     deviations = [factor * EDGE_PROBABILITY for factor in range(1, 21, 1)]
     for k in TYPES.keys():
@@ -64,22 +64,22 @@ def plot_avg_counts(avgCounts):
     plt.grid(True)
     figure = plt.gcf()  # get current figure
     figure.set_size_inches(16, 18)  # set figure's size manually to full screen
-    plt.savefig('../plots/paper-dijkstra-new.svg', bbox_inches='tight')  # bbox_inches removes extra white spaces
+    plt.savefig(r'C:\Users\Admin\PycharmProjects\smooth-heap-pub\plots\paper-dijkstra-lazy.svg', bbox_inches='tight')  # bbox_inches removes extra white spaces
     plt.legend(loc='best')
     plt.show()
 
 
-def export_results(xs, results, countType, heapTypes, filename="dijkstra"):
+def export_results(xs, results, countType, heapTypes, filename="dijkstra-lazy"):
     # parse data as randomness parameter; counts per heap type
     if countType == COUNT_TYPE_BOTH:
-        with open("../data/" + filename + '-comps.csv', 'w', newline='') as csvfile:
+        with open(r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\data\\" + filename + '-comps.csv', 'w', newline='') as csvfile:
             csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])
             csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.keys()])
             for i in range(len(results[0])):
                 row = [xs[i]] + [results[0][i][k] for k in TYPES.keys()]
                 csvwriter.writerow(row)
-        with open("../data/" + filename + '-links.csv', 'w', newline='') as csvfile:
+        with open(r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\data\\" + filename + '-links.csv', 'w', newline='') as csvfile:
             csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])
             csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.keys()])
@@ -87,7 +87,7 @@ def export_results(xs, results, countType, heapTypes, filename="dijkstra"):
                 row = [xs[i]] + [results[1][i][k] for k in TYPES.keys()]
                 csvwriter.writerow(row)
     else:
-        fn = "../data/" + filename + '-links.csv' if countType == COUNT_TYPE_LINKS else "../data/" + filename + '-comps.csv'
+        fn = r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\data\\" + filename + '-links.csv' if countType == COUNT_TYPE_LINKS else r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\data\\" + filename + '-comps.csv'
         with open(fn, 'w', newline='') as csvfile:
             csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])
@@ -187,4 +187,4 @@ if __name__ == "__main__":
         minCompsPerSize += [minCountsComps]
 
     plot_avg_counts([avgCompsPerSize, avgLinksPerSize, maxCompsPerSize, maxLinksPerSize,  minCompsPerSize, minLinksPerSize])
-    export_results(xs, [avgCompsPerSize, avgLinksPerSize], COUNT_TYPE_BOTH, TYPES, "dijkstra")
+    export_results(xs, [avgCompsPerSize, avgLinksPerSize], COUNT_TYPE_BOTH, TYPES, "dijkstra-lazy")

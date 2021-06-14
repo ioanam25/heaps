@@ -5,6 +5,7 @@ behaviour is decided upon initialisation by a type ID"""
 from node import Node
 from pairing_heap_interface import PairingHeapInterface
 from pairing_heap_standard import PairingHeapStandard
+from pairing_lazy_ioana import PairingHeapLazy
 from smooth_heap import SmoothHeap
 from pairing_heap_l import PairingHeapL
 from smooth_heap_l import SmoothHeapL
@@ -17,7 +18,7 @@ COUNT_TYPE_BOTH=0
 
 
 class PairingHeap(PairingHeapInterface):
-	MODES = {21: "Pairing_L", 22: "Smooth_L", 23: "Slim_L", 24: "Slim"}
+	MODES = {21: "Pairing_L", 22: "Smooth_L", 23: "Slim_L", 24: "Slim", 25: "PairingLazy"}
 	mode = 0
 	countType = COUNT_TYPE_COMPS
 	heap = None
@@ -39,7 +40,10 @@ class PairingHeap(PairingHeapInterface):
 			self.heap = SlimHeapL()  # root list version, everything lazy, to be used for Dijkstra test in paper
 		elif self.mode == 24:
 			self.heap = SlimHeap()
+		elif self.mode == 25:
+			self.heap = PairingHeapLazy()
 		else:
+			print(self.mode)
 			raise Exception("Invalid heap ID! No heap of type ID {} is implemented.")
 	
 	def find_min(self):

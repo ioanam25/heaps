@@ -23,10 +23,10 @@ COUNT_TYPE_LINKS = -1
 COUNT_TYPE_COMPS = -2
 MAXSIZE = 18
 NUMBER_TESTS = 5  # number of tests to run
-TYPES = {0: "Pairing", 12: "Smooth", 24:"Slim"}
+TYPES = {0: "Pairing", 12: "Smooth", 24:"Slim", 25:"Pairing Lazy"}
 MAX_TYPE_KEY = max(TYPES.keys())
-COLOURS = {0: 'xkcd:fire engine red', 12:'xkcd:sea green', 24:'xkcd:electric blue'}
-SHADE_COLOURS = {0: 'xkcd:fire engine red', 12:'xkcd:sea green', 24:'xkcd:electric blue'}
+COLOURS = {0: 'xkcd:fire engine red', 12:'xkcd:sea green', 24:'xkcd:electric blue', 25:'mauve'}
+SHADE_COLOURS = {0: 'xkcd:fire engine red', 12:'xkcd:sea green', 24:'xkcd:electric blue', 25'mauve'}
 
 
 def isSorted(list0):
@@ -35,8 +35,8 @@ def isSorted(list0):
 
 def plot_avg_counts_uni(avgCounts):
     # colours from https://xkcd.com/color/rgb/
-    MARKERS_COMP = {0: "o", 12: "^", 24:"p"}  # https://matplotlib.org/3.1.1/api/markers_api.html
-    MARKERS_LINK = {0: "o", 12: "D", 24:"X"}
+    MARKERS_COMP = {0: "o", 12: "^", 24:"p", 25:"s"}  # https://matplotlib.org/3.1.1/api/markers_api.html
+    MARKERS_LINK = {0: "o", 12: "D", 24:"X", 25:"*"}
     plt.figure('avg number of operations by heap type')
     for k in TYPES.keys():
         avgComps = [acounts[k] for acounts in avgCounts[0]]
@@ -66,22 +66,22 @@ def plot_avg_counts_uni(avgCounts):
     plt.grid(True)
     figure = plt.gcf()  # get current figure
     figure.set_size_inches(16, 18)  # set figure's size manually to your full screen (32x18)
-    plt.savefig('../plots/paper-sorting-uniform-new.svg', bbox_inches='tight')  # bbox_inches removes extra white spaces
+    plt.savefig(r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\plots\paper-sorting-uniform-lazy.svg", bbox_inches='tight')  # bbox_inches removes extra white spaces
     plt.legend(loc='best')
     plt.show()
 
 
-def export_results(params, results, countType, heapTypes, filename="sorting-uniform"):
+def export_results(params, results, countType, heapTypes, filename="sorting-uniform-lazy"):
     # parse data as randomness parameter; counts per heap type
     if countType == COUNT_TYPE_BOTH:
-        with open("../data/" + filename + '-comps.csv', 'w', newline='') as csvfile:
+        with open(r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\data\\" + filename + '-comps.csv', 'w', newline='') as csvfile:
             csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])
             csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.keys()])
             for i in range(len(results[0])):
                 row = [params[i]] + [results[0][i][k] for k in TYPES.keys()]
                 csvwriter.writerow(row)
-        with open("../data/" + filename + '-links.csv', 'w', newline='') as csvfile:
+        with open(r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\data\\" + filename + '-links.csv', 'w', newline='') as csvfile:
             csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])
             csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.keys()])
@@ -89,7 +89,7 @@ def export_results(params, results, countType, heapTypes, filename="sorting-unif
                 row = [params[i]] + [results[1][i][k] for k in TYPES.keys()]
                 csvwriter.writerow(row)
     else:
-        fn = "../data/" + filename + '-links.csv' if countType == COUNT_TYPE_LINKS else "../data/" + filename + '-comps.csv'
+        fn = r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\data\\" + filename + '-links.csv' if countType == COUNT_TYPE_LINKS else r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\data\\" + filename + '-comps.csv'
         with open(fn, 'w', newline='') as csvfile:
             csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])
@@ -164,4 +164,4 @@ if __name__ == "__main__":
         minCompsPerSize += [minCountsComps]
     plot_avg_counts_uni(
         [avgCompsPerSize, avgLinksPerSize, maxCompsPerSize, maxLinksPerSize, minCompsPerSize, minLinksPerSize])
-    export_results(params, [avgCompsPerSize, avgLinksPerSize], COUNT_TYPE_BOTH, TYPES, "sorting-uniform-new")
+    export_results(params, [avgCompsPerSize, avgLinksPerSize], COUNT_TYPE_BOTH, TYPES, "sorting-uniform-lazy")

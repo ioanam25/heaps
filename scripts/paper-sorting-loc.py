@@ -23,10 +23,10 @@ COUNT_TYPE_LINKS = -1
 COUNT_TYPE_COMPS = -2
 NUMBER_TESTS = 10  # number of tests to run
 INCREMENT_LOC = 0.01
-TYPES = {0: "Pairing", 12: "Smooth", 24:"Slim"}
+TYPES = {0: "Pairing", 12: "Smooth", 24:"Slim", 25:"Pairing Lazy"}
 MAX_TYPE_KEY = max(TYPES.keys())
-COLOURS = {0: 'xkcd:fire engine red', 12:'xkcd:sea green', 24:'xkcd:electric blue'}
-SHADE_COLOURS = {0: 'xkcd:fire engine red', 12:'xkcd:sea green', 24:'xkcd:electric blue'}
+COLOURS = {0: 'xkcd:fire engine red', 12:'xkcd:sea green', 24:'xkcd:electric blue', 25:'xkcd:mauve'}
+SHADE_COLOURS = {0: 'xkcd:fire engine red', 12:'xkcd:sea green', 24:'xkcd:electric blue', 25:'xkcd:mauve'}
 
 
 def isSorted(list0):
@@ -46,8 +46,8 @@ def localizedShuffleByIndex(llist, sdev):
 
 def plot_avg_counts(avgCounts):
 	# colours from https://xkcd.com/color/rgb/
-	MARKERS_COMP = {0:"o", 12:"^", 24:"p"}#https://matplotlib.org/3.1.1/api/markers_api.html
-	MARKERS_LINK = {0:"o", 12:"D", 24:"X"}
+	MARKERS_COMP = {0:"o", 12:"^", 24:"p", 25:"s"}#https://matplotlib.org/3.1.1/api/markers_api.html
+	MARKERS_LINK = {0:"o", 12:"D", 24:"X", 25:"*"}
 
 	plt.figure('avg number of operations by heap type')
 	deviations = [fac * INCREMENT_LOC for fac in range(0, math.ceil(0.3 / INCREMENT_LOC), 1)]
@@ -72,24 +72,24 @@ def plot_avg_counts(avgCounts):
 	plt.grid(True)
 	figure = plt.gcf()  # get current figure
 	figure.set_size_inches(16, 18)  # set figure's size manually to your full screen (32x18)
-	plt.savefig('../plots/paper-sorting-loc-new.svg', bbox_inches='tight')  # bbox_inches removes extra white spaces
+	plt.savefig(r'C:\Users\Admin\PycharmProjects\smooth-heap-pub\plots\paper-sorting-loc-lazy.svg', bbox_inches='tight')  # bbox_inches removes extra white spaces
 	plt.legend(loc='best')
 	plt.show()
 
 
 
-def export_results(params, results, countType, heapTypes, filename="sorting-loc"):
+def export_results(params, results, countType, heapTypes, filename="sorting-loc-lazy"):
 	#  exports results of simulation as separate .csv files, one for links and one for comparisons, into ../data directory
 	#  each row contains randomness parameter value; plus one column containing the number of operations for each heap type
 	if countType == COUNT_TYPE_BOTH:
-		with open("../data/" + filename + '-comps.csv', 'w', newline='') as csvfile:
+		with open(r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\data\\" + filename + '-comps.csv', 'w', newline='') as csvfile:
 			csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 			csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])
 			csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.keys()])
 			for i in range(len(results[0])):
 				row = [params[i]] + [results[0][i][k] for k in TYPES.keys()]
 				csvwriter.writerow(row)
-		with open("../data/" + filename + '-links.csv', 'w', newline='') as csvfile:
+		with open(r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\data\\" + filename + '-links.csv', 'w', newline='') as csvfile:
 			csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 			csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])
 			csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.keys()])
@@ -97,7 +97,7 @@ def export_results(params, results, countType, heapTypes, filename="sorting-loc"
 				row = [params[i]] + [results[1][i][k] for k in TYPES.keys()]
 				csvwriter.writerow(row)
 	else:
-		fn = "../data/" + filename + '-links.csv' if countType == COUNT_TYPE_LINKS else "../data/" + filename + '-comps.csv'
+		fn = r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\data\\" + filename + '-links.csv' if countType == COUNT_TYPE_LINKS else r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\data\\" + filename + '-comps.csv'
 		with open(fn, 'w', newline='') as csvfile:
 			csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 			csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])
@@ -169,5 +169,5 @@ if __name__ == "__main__":
 		minLinksPerSize += [minCountsLinks]
 		minCompsPerSize += [minCountsComps]
 	plot_avg_counts([avgCompsPerSize, avgLinksPerSize, maxCompsPerSize, maxLinksPerSize, minCompsPerSize, minLinksPerSize])
-	export_results(params, [avgCompsPerSize, avgLinksPerSize], COUNT_TYPE_BOTH, TYPES, "sorting-loc-new")
+	export_results(params, [avgCompsPerSize, avgLinksPerSize], COUNT_TYPE_BOTH, TYPES, "sorting-loc-lazy")
 

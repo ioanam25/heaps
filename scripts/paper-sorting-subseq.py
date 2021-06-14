@@ -27,10 +27,10 @@ NUMBER_TESTS = 20  # number of tests to run
 LIST_LEN = 10000  # number of elements in test list
 TEST_SIZE = 10000  # number of elements in test list
 INCREMENT_SUBSEQS = 100
-TYPES = {0: "Pairing", 12: "Smooth", 24: "Slim"} 
+TYPES = {0: "Pairing", 12: "Smooth", 24: "Slim", 25: "Pairing Lazy"}
 MAX_TYPE_KEY = max(TYPES.keys())
-COLOURS = {0: 'xkcd:fire engine red', 12:'xkcd:sea green', 24:'xkcd:electric blue'}
-SHADE_COLOURS = {0: 'xkcd:fire engine red', 12:'xkcd:sea green', 24:'xkcd:electric blue'}
+COLOURS = {0: 'xkcd:fire engine red', 12:'xkcd:sea green', 24:'xkcd:electric blue', 25:'mauve'}
+SHADE_COLOURS = {0: 'xkcd:fire engine red', 12:'xkcd:sea green', 24:'xkcd:electric blue', 25:'mauve'}
 
 
 def isSorted(list0):
@@ -53,8 +53,8 @@ def generateContSortedSubseq(llist, sublen):
 
 def plot_avg_counts(avgCounts):
 	# colours from https://xkcd.com/color/rgb/
-	MARKERS_COMP = {0:"o", 12:"^", 24: "p"}#https://matplotlib.org/3.1.1/api/markers_api.html
-	MARKERS_LINK = {0:"o", 12:"D", 24:"X"}
+	MARKERS_COMP = {0:"o", 12:"^", 24: "p", 25:"s"}#https://matplotlib.org/3.1.1/api/markers_api.html
+	MARKERS_LINK = {0:"o", 12:"D", 24:"X", 24:"*"}
 	plt.figure('avg number of operations by heap type')
 	deviations = [fac*INCREMENT_SUBSEQS/200 for fac in range(1, math.ceil((TEST_SIZE/5)/INCREMENT_SUBSEQS), 1)]
 	deviations.reverse()
@@ -82,23 +82,23 @@ def plot_avg_counts(avgCounts):
 	plt.gca().invert_xaxis()
 	figure = plt.gcf()  # get current figure
 	figure.set_size_inches(16, 18)  # set figure's size manually to full screen
-	plt.savefig('../plots/paper-sorting-subseq-new.svg', bbox_inches='tight')  # bbox_inches removes extra white spaces
+	plt.savefig(r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\plots\paper-sorting-subseq-lazy.svg", bbox_inches='tight')  # bbox_inches removes extra white spaces
 	plt.legend(loc='best')
 	plt.show()
 
 
-def export_results(params, results, countType, heapTypes, filename="sorting-subseq"):
+def export_results(params, results, countType, heapTypes, filename="sorting-subseq-lazy"):
 	#  exports results of simulation as separate .csv files, one for links and one for comparisons, into ../data directory
 	#  each row contains randomness parameter value; plus one column containing the number of operations for each heap type
 	if countType == COUNT_TYPE_BOTH:
-		with open("../data/" + filename + '-comps.csv', 'w', newline='') as csvfile:
+		with open(r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\data\\" + filename + '-comps.csv', 'w', newline='') as csvfile:
 			csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 			csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])
 			csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.keys()])
 			for i in range(len(results[0])):
 				row = [params[i]] + [results[0][i][k] for k in TYPES.keys()]
 				csvwriter.writerow(row)
-		with open("../data/" + filename + '-links.csv', 'w', newline='') as csvfile:
+		with open(r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\data\\" + filename + '-links.csv', 'w', newline='') as csvfile:
 			csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 			csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])
 			csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.keys()])
@@ -106,7 +106,7 @@ def export_results(params, results, countType, heapTypes, filename="sorting-subs
 				row = [params[i]] + [results[1][i][k] for k in TYPES.keys()]
 				csvwriter.writerow(row)
 	else:
-		fn = "../data/" + filename + '-links.csv' if countType == COUNT_TYPE_LINKS else "../data/" + filename + '-comps.csv'
+		fn = r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\data\\" + filename + '-links.csv' if countType == COUNT_TYPE_LINKS else r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\data\\" + filename + '-comps.csv'
 		with open(fn, 'w', newline='') as csvfile:
 			csvwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 			csvwriter.writerow(["randomness parameter value"] + [name for name in TYPES.values()])
@@ -177,5 +177,5 @@ if __name__ == "__main__":
 		minLinksPerSize += [minCountsLinks]
 		minCompsPerSize += [minCountsComps]
 	plot_avg_counts([avgCompsPerSize, avgLinksPerSize, maxCompsPerSize, maxLinksPerSize, minCompsPerSize, minLinksPerSize])
-	export_results(params, [avgCompsPerSize, avgLinksPerSize], COUNT_TYPE_BOTH, TYPES, "sorting-subseq-new")
+	export_results(params, [avgCompsPerSize, avgLinksPerSize], COUNT_TYPE_BOTH, TYPES, "sorting-subseq-lazy")
 
