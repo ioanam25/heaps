@@ -124,7 +124,7 @@ class PairingHeapLazy(PairingHeapInterface):
         # print("forest length before pairing", len(self.forest))
         if len(self.forest) > 1:
             cn = self.pairing()
-            return (oldMinNode, cn, cn*2)
+            return (oldMinNode, cn*2, cn)
         elif len(self.forest) == 1:
             self.minNodeIndex = 0
             self.minNode = self.forest[0]
