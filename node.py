@@ -14,6 +14,7 @@ class Node:
 		self.prevSibling = None
 		self.leftOnly = False
 		self.rightOnly = False
+		self.min = None # min key in subtree
 		
 		self.vertex = None  # used for testing with Dijkstra's algorithm
 
