@@ -7,11 +7,13 @@ class PairingHeapL(PairingHeapInterface):
     """lazy variant of standard pairing heap
     (maintaining root-list and consolidating only upon extract-min)"""
     forest = []  # list storing roots of all top-level trees
+    updates = 0
 
     def __init__(self, root=None):
         self.forest = []
         if root is not None:
             root.parent = None
+            self.updates += 1
             self.forest += [root]
 
     def listInorder(self):
@@ -32,6 +34,7 @@ class PairingHeapL(PairingHeapInterface):
         if node is None:
             return 0
         node.parent = None
+        self.updates += 1
         self.forest += [node]
         return 0
 
@@ -51,16 +54,22 @@ class PairingHeapL(PairingHeapInterface):
                     if self.forest[i].key <= self.forest[i + 1].key:
                         if self.forest[i].leftChild == None:
                             self.forest[i + 1].parent = self.forest[i]
+                            self.updates += 1
                         else:
                             self.forest[i + 1].nextSibling = self.forest[i].leftChild
+                            self.updates += 1
                         self.forest[i].leftChild = self.forest[i + 1]
+                        self.updates += 1
                         pairedForest += [self.forest[i]]
                     else:
                         if self.forest[i + 1].leftChild == None:
                             self.forest[i].parent = self.forest[i + 1]
+                            self.updates += 1
                         else:
                             self.forest[i].nextSibling = self.forest[i + 1].leftChild
+                            self.updates += 1
                         self.forest[i + 1].leftChild = self.forest[i]
+                        self.updates += 1
                         pairedForest += [self.forest[i + 1]]
             self.forest = pairedForest
 
@@ -70,15 +79,21 @@ class PairingHeapL(PairingHeapInterface):
                 if self.forest[index].key <= self.forest[i].key:
                     if self.forest[index].leftChild == None:
                         self.forest[i].parent = self.forest[index]
+                        self.updates += 1
                     else:
                         self.forest[i].nextSibling = self.forest[index].leftChild
+                        self.updates += 1
                     self.forest[index].leftChild = self.forest[i]
+                    self.updates += 1
                 else:
                     if self.forest[i].leftChild == None:
                         self.forest[index].parent = self.forest[i]
+                        self.updates += 1
                     else:
                         self.forest[index].nextSibling = self.forest[i].leftChild
+                        self.updates += 1
                     self.forest[i].leftChild = self.forest[index]
+                    self.updates += 1
                     index = i
 
             self.forest = [self.forest[index]]
@@ -93,8 +108,10 @@ class PairingHeapL(PairingHeapInterface):
             nextSibling = currentSibling.nextSibling
             self.forest += [currentSibling]
             currentSibling.nextSibling = None
+            self.updates += 1
             currentSibling = nextSibling
         self.forest[-1].parent = None  # only for the last concatenated sibling as only this one carried parent pointer
+        self.updates += 1
         minNode = self.forest[0]
         self.forest = self.forest[1:]
         return (minNode, cn, cn)
@@ -106,9 +123,11 @@ class PairingHeapL(PairingHeapInterface):
             return 0
         elif node.parent is None and node.nextSibling is None:  # node is root
             node.key = node.key - diff
+            self.updates += 1
         else:
             self.unlink_node(node)
             node.key = node.key - diff
+            self.updates += 1
             self.forest += [node]
         return 0
 
@@ -137,8 +156,10 @@ class PairingHeapL(PairingHeapInterface):
             sibling = sibling.nextSibling
             if sibling is not None:
                 self.forest[-1].nextSibling = None
+                self.updates += 1
             else:
                 self.forest[-1].parent = None
+                self.updates += 1
         print("Result of deletion of {} is {}.".format(node.key, self.listInorder()))
 
     def unlink_node(self, node):
@@ -154,23 +175,34 @@ class PairingHeapL(PairingHeapInterface):
                 if temp.parent.leftChild == node:  # node is leftmost child
                     # link parent to next sibling
                     temp.parent.leftChild = node.nextSibling
+                    self.updates += 1
                     node.nextSibling = None
+                    self.updates += 1
                 else:
                     # node is neither first nor last child of parent
                     prevSibling = temp.parent.leftChild
                     while prevSibling.nextSibling != node:  # find left (previous) sibling
                         prevSibling = prevSibling.nextSibling
                     prevSibling.nextSibling = node.nextSibling  # cut out node, link left and right sibling
+                    self.updates += 1
                     node.nextSibling = None
+                    self.updates += 1
             else:
                 # node is rightmost child of parent
                 if node.parent.leftChild == node:
                     # node is only child: just remove
                     node.parent.leftChild = None
+                    self.updates += 1
                 else:
                     prevSibling = node.parent.leftChild
                     while prevSibling.nextSibling != node:  # find left (previous) sibling
                         prevSibling = prevSibling.nextSibling
                     prevSibling.parent = node.parent
+                    self.updates += 1
                     prevSibling.nextSibling = None
+                    self.updates += 1
             node.parent = None
+            self.updates += 1
+
+    def pointer_updates(self):
+        return self.updates

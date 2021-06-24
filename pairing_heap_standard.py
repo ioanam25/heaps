@@ -6,9 +6,11 @@ from pairing_heap_interface import PairingHeapInterface
 class PairingHeapStandard(PairingHeapInterface):
 	"""standard pairing heap
 	performs a left-to-right forward pass, then a backward combining pass to consolidate"""
+	updates = 0
 
 	def __init__(self, root=None):
 		self.root = root
+		self.updates += 1
 
 	def make_heap(self):
 		# this is equivalent to init
@@ -32,6 +34,7 @@ class PairingHeapStandard(PairingHeapInterface):
 		if self.root is None:
 			# heap was empty before
 			self.root = node
+			self.updates += 1
 		else:
 			newheap = PairingHeapStandard(node)
 			linkCount = self.merge(newheap)
@@ -50,16 +53,20 @@ class PairingHeapStandard(PairingHeapInterface):
 			# heap contained only one element
 			minNode = self.root
 			self.root = None
+			self.updates += 1
 			return (minNode, linkCount)
 		elif self.root.leftChild.nextSibling is None:
 			# first child has no siblings->first child becomes root
 			minNode = self.root
 			self.root = self.root.leftChild
+			self.updates += 1
 			self.root.parent = None
+			self.updates += 1
 			return (minNode, linkCount)
 		else:
 			minNode = self.root
 			self.root = self.root.leftChild
+			self.updates += 1
 			current = self.root
 			nextSibling = None
 			heaps = []
@@ -69,6 +76,7 @@ class PairingHeapStandard(PairingHeapInterface):
 				nextSibling = current.nextSibling
 				heaps += [PairingHeapStandard(current)]
 				current.nextSibling = None
+				self.updates += 1
 				current = nextSibling
 			for j in range(0, len(heaps), 2):
 				if j == (len(heaps) - 1):  # last one
@@ -82,7 +90,9 @@ class PairingHeapStandard(PairingHeapInterface):
 			for i in range(len(paired) - 2, -1, -1):
 				linkCount += combined.merge(paired[i])  # merge returns its number of link operations
 			self.root = combined.root
+			self.updates += 1
 			self.root.parent = None
+			self.updates += 1
 		return (minNode, linkCount)
 
 	def merge(self, heap2):
@@ -91,22 +101,30 @@ class PairingHeapStandard(PairingHeapInterface):
 		linkCount = 0  # counts number of linking operations
 		if self.root is None:  # heap is empty
 			self.root = heap2.root
+			self.updates += 1
 		elif heap2.root is None:  # heap 2 is empty
 			pass  # this heap is the result
 		else:
 			# link roots
 			if self.root.key <= heap2.root.key:
 				heap2.root.nextSibling = self.root.leftChild
+				self.updates += 1
 				if heap2.root.nextSibling is None:
 					heap2.root.parent = self.root
+					self.updates += 1
 				self.root.leftChild = heap2.root
+				self.updates += 1
 				linkCount = 1
 			else:
 				self.root.nextSibling = heap2.root.leftChild
+				self.updates += 1
 				if self.root.nextSibling is None:
 					self.root.parent = heap2.root
+					self.updates += 1
 				heap2.root.leftChild = self.root
+				self.updates += 1
 				self.root = heap2.root
+				self.updates += 1
 				linkCount = 1
 		return linkCount
 
@@ -116,12 +134,14 @@ class PairingHeapStandard(PairingHeapInterface):
 		linkCount = 0
 		if self.root == node:
 			self.root.key = self.root.key - diff
+			self.updates += 1
 		else:
 			# first step: cut node from heap
 			self.unlink_node(node)  # helper function
 			# second step: decrease key
 			subheap = PairingHeapStandard(node)
 			subheap.root.key = subheap.root.key - diff
+			self.updates += 1
 			# third step: merge back in
 			linkCount = self.merge(subheap)
 		return linkCount
@@ -148,6 +168,7 @@ class PairingHeapStandard(PairingHeapInterface):
 		"""removes node from heap, updating pointers accordingly"""
 		if self.root == node:  # remove the whole heap
 			self.root = None
+			self.updates += 1
 		else:
 			if node.nextSibling != None:
 				temp = node.nextSibling
@@ -156,22 +177,33 @@ class PairingHeapStandard(PairingHeapInterface):
 				if temp.parent.leftChild == node:  # node is leftmost child
 					# link parent to next sibling
 					temp.parent.leftChild = node.nextSibling
+					self.updates += 1
 					node.nextSibling = None
+					self.updates += 1
 				else:
 					# node is neither first nor last child of parent
 					prevSibling = temp.parent.leftChild
 					while prevSibling.nextSibling != node:  # find left (previous) sibling
 						prevSibling = prevSibling.nextSibling
+						self.updates += 1
 					prevSibling.nextSibling = node.nextSibling  # cut out node, link left and right sibling
+					self.updates += 1
 			else:
 				# node is rightmost child of parent
 				if node.parent.leftChild == node:
 					# node is only child: just remove
 					node.parent.leftChild = None
+					self.updates += 1
 				else:
 					prevSibling = node.parent.leftChild
 					while prevSibling.nextSibling != node:  # find left (previous) sibling
 						prevSibling = prevSibling.nextSibling
 					prevSibling.parent = node.parent
+					self.updates += 1
 					prevSibling.nextSibling = None
+					self.updates += 1
 			node.parent = None
+			self.updates += 1
+
+	def pointer_updates(self):
+		return self.updates

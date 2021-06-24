@@ -7,6 +7,8 @@ Results are stored as .csv files in ../data folder and plots of results in ../pl
 
 import os, sys, inspect
 # ensuring imports work
+from typing import List
+
 current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parent_dir = os.path.dirname(current_dir)
 sys.path.insert(0, parent_dir)
@@ -68,6 +70,32 @@ def plot_avg_counts(avgCounts):
     plt.legend(loc='best')
     plt.show()
 
+def plot_pointer_updates(avgCounts):
+    """generates and saves plot of results"""
+    # colours from https://xkcd.com/color/rgb/
+    MARKERS_POINTERS = {21:"o", 12:"d", 22:"^", 23:"p", 25:"s"}#https://matplotlib.org/3.1.1/api/markers_api.html
+    plt.figure('avg number of operations in Dijkstra\'s algorithm')
+    deviations = [factor * EDGE_PROBABILITY for factor in range(1, 21, 1)]
+    plt.figure('avg number of pointer updates in Dijkstra\'s algorithm')
+    for k in TYPES.keys():
+        avgPointers = [acounts[k] for acounts in avgCounts[0]]
+        maxPointers = [acounts[k] for acounts in avgCounts[1]]
+        minPointers = [acounts[k] for acounts in avgCounts[2]]
+        plt.plot(deviations, avgPointers, color=COLOURS[k], linestyle="--", marker=MARKERS_POINTERS[k], markerfacecolor=COLOURS[k], markersize=9, markeredgewidth=1, markeredgecolor='black', label=TYPES[k] + " links")
+        plt.fill_between(deviations, minPointers, maxPointers, color=SHADE_COLOURS[k], alpha=.3)
+
+    plt.xlabel('Edge probability', fontsize=39)
+    plt.ylabel('Avg. number of pointer updates / size', fontsize=39)
+    plt.xticks(fontsize=30)
+    plt.yticks(fontsize=30)
+    plt.rc('legend',fontsize=30)  # using a size in points
+    plt.legend()
+    plt.grid(True)
+    figure = plt.gcf()  # get current figure
+    figure.set_size_inches(16, 18)  # set figure's size manually to full screen
+    plt.savefig(r'C:\Users\Admin\PycharmProjects\smooth-heap-pub\plots\pointer-updates-dijkstra.svg', bbox_inches='tight')  # bbox_inches removes extra white spaces
+    plt.legend(loc='best')
+    plt.show()
 
 def export_results(xs, results, countType, heapTypes, filename="dijkstra-lazy"):
     # parse data as randomness parameter; counts per heap type
@@ -102,19 +130,25 @@ if __name__ == "__main__":
     testOutputCount = []
     avgLinksPerSize = []
     avgCompsPerSize = []
+    avgPointersPerSize = []
     maxLinksPerSize = []
     maxCompsPerSize = []
+    maxPointersPerSize = []
     minLinksPerSize = []
     minCompsPerSize = []
+    minPointersPerSize = []
 
     xs = [factor * EDGE_PROBABILITY for factor in range(1, 21, 1)]
     for x in xs:
         avgCountsLinks = [0 for _ in range(MAX_TYPE_KEY + 1)]
         avgCountsComps = [0 for _ in range(MAX_TYPE_KEY + 1)]
+        avgCountsPointers = [0 for _ in range(MAX_TYPE_KEY + 1)]
         maxCountsLinks = [0 for _ in range(MAX_TYPE_KEY + 1)]
-        maxCountsComps = [0 for _ in range(MAX_TYPE_KEY + 1)]
+        maxCountsComps: list[int] = [0 for _ in range(MAX_TYPE_KEY + 1)]
+        maxCountsPointers = [0 for _ in range(MAX_TYPE_KEY + 1)]
         minCountsLinks = [1000000000000 for _ in range(MAX_TYPE_KEY + 1)]
         minCountsComps = [1000000000000 for _ in range(MAX_TYPE_KEY + 1)]
+        minCountsPointers = [1000000000000 for _ in range(MAX_TYPE_KEY + 1)]
 
 
         for _ in range(NUMBER_TESTS):
@@ -123,6 +157,7 @@ if __name__ == "__main__":
             graph = nx.fast_gnp_random_graph(TEST_SIZE, x)
             for (u, v) in graph.edges():  # assign weights
                 graph.edges[u, v]['w'] = random.randint(1, WEIGHT_RANGE)
+            heapType: int
             for heapType in TYPES.keys():
                 for v in graph.nodes():
                     graph.nodes[v]['v'] = False  # "visited" marker
@@ -164,13 +199,18 @@ if __name__ == "__main__":
                             compCount += cc
                             dist[v] = alt
                             prev[v] = u
+
+                    pointers = heap.pointer_updates()
                 # track avg. results
                 avgCountsLinks[heapType] += (linkCount / NUMBER_TESTS)/TEST_SIZE
                 avgCountsComps[heapType] += (compCount / NUMBER_TESTS)/TEST_SIZE
+                avgCountsPointers[heapType] += (pointers / NUMBER_TESTS)/TEST_SIZE
                 maxCountsLinks[heapType] = max(maxCountsLinks[heapType], linkCount/TEST_SIZE)
                 maxCountsComps[heapType] = max(maxCountsComps[heapType], compCount/TEST_SIZE)
+                maxCountsPointers[heapType] = max(maxCountsPointers[heapType], pointers/TEST_SIZE)
                 minCountsLinks[heapType] = min(minCountsLinks[heapType], linkCount/TEST_SIZE)
                 minCountsComps[heapType] = min(minCountsComps[heapType], compCount/TEST_SIZE)
+                minCountsPointers[heapType] = min(minCountsPointers[heapType], pointers/TEST_SIZE)
 
         for heapType in TYPES.keys():
             pid = os.getpid()
@@ -181,10 +221,14 @@ if __name__ == "__main__":
                     TYPES[heapType], avgCountsComps[heapType], avgCountsLinks[heapType], memoryUse, len(graph.nodes()), len(graph.edges())))
         avgLinksPerSize += [avgCountsLinks]
         avgCompsPerSize += [avgCountsComps]
+        avgPointersPerSize += [avgCountsPointers]
         maxLinksPerSize += [maxCountsLinks]
         maxCompsPerSize += [maxCountsComps]
+        maxPointersPerSize += [maxCountsPointers]
         minLinksPerSize += [minCountsLinks]
         minCompsPerSize += [minCountsComps]
+        minPointersPerSize += [minCountsPointers]
 
     plot_avg_counts([avgCompsPerSize, avgLinksPerSize, maxCompsPerSize, maxLinksPerSize,  minCompsPerSize, minLinksPerSize])
+    plot_pointer_updates([avgPointersPerSize, maxPointersPerSize, minPointersPerSize])
     export_results(xs, [avgCompsPerSize, avgLinksPerSize], COUNT_TYPE_BOTH, TYPES, "dijkstra-lazy")

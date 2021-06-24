@@ -22,3 +22,6 @@ class PairingHeapInterface:
 
 	def delete(self, node):
 		pass
+
+	def pointer_updates(self):
+		pass

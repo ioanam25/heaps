@@ -8,13 +8,17 @@ class SlimHeapL(PairingHeapInterface):
     """lazy implementation of slim heap without buffer"""
     forest = []  # list storing roots of all top-level trees
     minNode = None
+    updates = 0
 
     def __init__(self, root=None):
         self.forest = []
         if root != None:
             root.parent = None
+            self.updates += 1
             root.nextSibling = root
+            self.updates += 1
             self.minNode = root
+            self.updates += 1
             self.forest += [root]
 
     def make_heap(self):
@@ -47,11 +51,16 @@ class SlimHeapL(PairingHeapInterface):
         """child becomes leftmost child of parent"""
         if parent.rightChild is None:
             parent.rightChild = child
+            self.updates += 1
             child.nextSibling = child
+            self.updates += 1
         else:
             child.nextSibling = parent.rightChild.nextSibling
+            self.updates += 1
             parent.rightChild.nextSibling = child
+            self.updates += 1
         child.parent = parent
+        self.updates += 1
                 
 
     def insert(self, node):
@@ -59,7 +68,9 @@ class SlimHeapL(PairingHeapInterface):
         if node is None:
             return (0, 0)  # no comparisons, no links
         node.nextSibling = node
+        self.updates += 1
         node.parent = None
+        self.updates += 1
         self.forest += [node]
         return (0, 0)  # 1 comparison, no links
 
@@ -90,15 +101,19 @@ class SlimHeapL(PairingHeapInterface):
         if self.minNode.rightChild is not None:
             minNodeChildren += [self.minNode.rightChild]
             self.minNode.rightChild.parent = None
+            self.updates += 1
             current = self.minNode.rightChild.nextSibling
             self.minNode.rightChild.nextSibling = self.minNode.rightChild
+            self.updates += 1
 
             while current != self.minNode.rightChild:
                 minNodeChildren += [current]
                 tempNode = current
                 current = current.nextSibling
                 tempNode.nextSibling = tempNode
+                self.updates += 1
                 tempNode.parent = None
+                self.updates += 1
         self.forest = minNodeChildren
         return (minKeyNode, cc, lc)
 
@@ -160,6 +175,7 @@ class SlimHeapL(PairingHeapInterface):
             self.forest = curr_forest
             assert len(self.forest) == 1
             self.minNode = self.forest[0]
+            self.updates += 1
         assert (fs - 1 == linkCount)
         return (compCount, linkCount)
 
@@ -169,6 +185,7 @@ class SlimHeapL(PairingHeapInterface):
         decreases key; places node in root list."""
         assert node is not None
         node.key = node.key - diff
+        self.updates += 1
         # concatenates node to list of trees in pool
 
         if node.parent is None:  # node is a root and has children
@@ -181,16 +198,24 @@ class SlimHeapL(PairingHeapInterface):
 
             if node.nextSibling == node:  # node has no siblings
                 node.parent.rightChild = None
+                self.updates += 1
 
             else:  # node has siblings
                 current = node.nextSibling
                 while current.nextSibling != node:  # find predecessor of node
                     current = current.nextSibling
                 current.nextSibling = node.nextSibling
+                self.updates += 1
                 if node.parent.rightChild == node:
                     node.parent.rightChild = current
+                    self.updates += 1
 
             node.parent = None
+            self.updates += 1
             node.nextSibling = node
+            self.updates += 1
             self.forest += [node]
         return (0, 0)
+
+    def pointer_updates(self):
+        return self.updates

@@ -15,8 +15,11 @@ class SlimHeap(PairingHeapInterface):
         self.buffer = []
         if root is not None:
             root.parent = None
+            self.updates += 1
             root.nextSibling = root
+            self.updates += 1
             self.minNode = root
+            self.updates += 1
             self.forest += [root]
 
 
@@ -50,45 +53,63 @@ class SlimHeap(PairingHeapInterface):
         print("buffer: {}".format(buf))
         
     def link(self, parent, child):
-    	"""child becomes leftmost child of parent"""
-    	if parent.rightChild is None:
-    		parent.rightChild = child
-    		child.nextSibling = child
-    	else:
-    		child.nextSibling = parent.rightChild.nextSibling
-    		parent.rightChild.nextSibling = child
-    	child.parent = parent
+        """child becomes leftmost child of parent"""
+        if parent.rightChild is None:
+            parent.rightChild = child
+            self.updates += 1
+            child.nextSibling = child
+            self.updates += 1
+        else:
+            child.nextSibling = parent.rightChild.nextSibling
+            self.updates += 1
+            parent.rightChild.nextSibling = child
+            self.updates += 1
+        child.parent = parent
+        self.updates += 1
 
     def stable_link_left(self, left, right):
         """left node becomes parent of right node"""
         if left.rightChild is not None:
             right.nextSibling = left.rightChild.nextSibling
+            self.updates += 1
             left.rightChild.nextSibling = right
+            self.updates += 1
         else:
             right.nextSibling = right
+            self.updates += 1
         left.rightChild = right
+        self.updates += 1
         right.parent = left
+        self.updates += 1
 
     def stable_link_right(self, left, right):
         """right node becomes parent of left node"""
         if right.rightChild is None:
             right.rightChild = left
+            self.updates += 1
             left.nextSibling = left
+            self.updates += 1
         else:
             left.nextSibling = right.rightChild.nextSibling
+            self.updates += 1
             right.rightChild.nextSibling = left
+            self.updates += 1
         left.parent = right
+        self.updates += 1
 
     def insert(self, node):
         """concatenates node to list of roots in forest list"""
         if node is None:
             return (0, 0)  # no comparisons, no links
         node.nextSibling = node
+        self.updates += 1
         node.parent = None
+        self.updates += 1
         self.forest += [node]
         self.size += 1
         if self.minNode is None or node.key <= self.minNode.key:
             self.minNode = node
+            self.updates += 1
         return (1, 0)  # 1 comparison, no links
 
     def merge(self, heap2):
@@ -113,6 +134,7 @@ class SlimHeap(PairingHeapInterface):
         self.size += heap2.size
         if (self.minNode.key >= heap2.minNode.key):
             self.minNode = heap2.minNode
+            self.updates += 1
         return (compCount, linkCount)
 
     def delete_min(self):
@@ -128,15 +150,20 @@ class SlimHeap(PairingHeapInterface):
         if self.minNode.rightChild is not None:
             minNodeChildren += [self.minNode.rightChild]
             self.minNode.rightChild.parent = None
+            self.updates += 1
             current = self.minNode.rightChild.nextSibling
+            self.updates += 1
             self.minNode.rightChild.nextSibling = self.minNode.rightChild
+            self.updates += 1
 
             while current != self.minNode.rightChild:
                 minNodeChildren += [current]
                 tempNode = current
                 current = current.nextSibling
                 tempNode.nextSibling = tempNode
+                self.updates += 1
                 tempNode.parent = None
+                self.updates += 1
         idx = self.forest.index(self.minNode)
         self.forest = self.forest[:idx] + minNodeChildren + self.forest[idx + 1:]  # replace minNode with its children
         self.size -= 1
@@ -252,6 +279,7 @@ class SlimHeap(PairingHeapInterface):
         linkCount = 0
         compCount = 0
         node.key = node.key - diff
+        self.updates += 1
 
         if node.parent is None and node.rightChild is None:  # node is root and has no children
             # could just leave this in place alternatively
@@ -269,10 +297,14 @@ class SlimHeap(PairingHeapInterface):
             leftChild = node.rightChild.nextSibling
             if leftChild.nextSibling != leftChild:
                 node.rightChild.nextSibling = leftChild.nextSibling  # cut out leftmost child
+                self.updates += 1
             else:
                 node.rightChild = None
+                self.updates += 1
             leftChild.nextSibling = leftChild
+            self.updates += 1
             leftChild.parent = None
+            self.updates += 1
             if node in self.forest:
                 idx = self.forest.index(node)  # remove node from pool and replace with leftChild
                 self.forest = self.forest[:idx] + [leftChild] + self.forest[idx + 1:]
@@ -284,43 +316,61 @@ class SlimHeap(PairingHeapInterface):
                 raise Exception("node with key {} is not in heap".format(node.key))
         else:  # node is not a root
             leftChild = None
+            self.updates += 1
             if node.rightChild is not None:
                 leftChild = node.rightChild.nextSibling
+                self.updates += 1
                 leftChild.parent = node.parent
+                self.updates += 1
             current = node.parent.rightChild
+            self.updates += 1
 
             if node.nextSibling == node and leftChild is not None:  # node not a leaf and has no siblings
                 if leftChild.nextSibling != leftChild:
                     node.rightChild.nextSibling = leftChild.nextSibling  # cut out leftmost child
+                    self.updates += 1
                 else:
                     node.rightChild = None
+                    self.updates += 1
                 leftChild.nextSibling = leftChild
+                self.updates += 1
                 node.parent.rightChild = leftChild
+                self.updates += 1
 
             elif leftChild is not None:  # node is not a leaf and has siblings
                 if leftChild.nextSibling != leftChild:
                     node.rightChild.nextSibling = leftChild.nextSibling  # cut out leftmost child
+                    self.updates += 1
                 else:
                     node.rightChild = None
+                    self.updates += 1
                 while current.nextSibling != node:  # find predecessor of node
                     current = current.nextSibling
                 current.nextSibling = leftChild
+                self.updates += 1
                 leftChild.nextSibling = node.nextSibling
+                self.updates += 1
                 if node.parent.rightChild == node:
                     node.parent.rightChild = leftChild
+                    self.updates += 1
 
             elif node.nextSibling != node:  # node is leaf and has siblings
                 while current.nextSibling != node:
                     current = current.nextSibling
                 current.nextSibling = node.nextSibling
+                self.updates += 1
                 if node.parent.rightChild == node:
                     node.parent.rightChild = current
+                    self.updates += 1
 
             else:  # node is leaf and has no siblings
                 node.parent.rightChild = None
+                self.updates += 1
 
             node.parent = None
+            self.updates += 1
             node.nextSibling = node
+            self.updates += 1
             self.buffer += [node]
 
         if len(self.buffer) > math.ceil(math.log(self.size, 2)):
@@ -328,3 +378,6 @@ class SlimHeap(PairingHeapInterface):
             compCount += cc2
             linkCount += lc2
         return (compCount, linkCount)
+
+    def pointer_updates(self):
+        return self.updates

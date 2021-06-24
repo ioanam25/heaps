@@ -9,11 +9,13 @@ class PairingHeapLazy(PairingHeapInterface):
     forest = []  # list storing roots of all top-level trees
     minNode = None
     minNodeIndex = -1
+    updates = 0
 
     def __init__(self, root=None):
         self.forest = []
         if root is not None:
             root.parent = None
+            self.updates += 1
             self.forest += [root]
 
     def listInorder(self):
@@ -34,9 +36,11 @@ class PairingHeapLazy(PairingHeapInterface):
         if node is None:
             return 0
         node.parent = None
+        self.updates += 1
         self.forest += [node]
         if self.minNode is None or node.key <= self.minNode.key:
             self.minNode = node
+            self.updates += 1
             self.minNodeIndex = len(self.forest) - 1
         return 0
 
@@ -62,9 +66,12 @@ class PairingHeapLazy(PairingHeapInterface):
                     if self.forest[i].key <= self.forest[i + 1].key:
                         if self.forest[i].leftChild == None:
                             self.forest[i + 1].parent = self.forest[i]
+                            self.updates += 1
                         else:
                             self.forest[i + 1].nextSibling = self.forest[i].leftChild
+                            self.updates += 1
                         self.forest[i].leftChild = self.forest[i + 1]
+                        self.updates += 1
                         if self.forest[i].key < currentMin.key:
                             currentMin = self.forest[i]
                         # print(self.forest[i])
@@ -72,9 +79,12 @@ class PairingHeapLazy(PairingHeapInterface):
                     else:
                         if self.forest[i + 1].leftChild == None:
                             self.forest[i].parent = self.forest[i + 1]
+                            self.updates += 1
                         else:
                             self.forest[i].nextSibling = self.forest[i + 1].leftChild
+                            self.updates += 1
                         self.forest[i + 1].leftChild = self.forest[i]
+                        self.updates += 1
                         if self.forest[i + 1].key < currentMin.key:
                             currentMin = self.forest[i + 1]
                         # print(self.forest[i + 1])
@@ -82,6 +92,7 @@ class PairingHeapLazy(PairingHeapInterface):
             self.forest = pairedForest
             # print(self.listInorder())
             self.minNode = currentMin
+            self.updates += 1
             self.minNodeIndex = self.forest.index(self.minNode)
             # print("index is ", self.minNodeIndex)
             # print("forest length is ", len(self.forest))
@@ -117,8 +128,10 @@ class PairingHeapLazy(PairingHeapInterface):
             nextSibling = currentSibling.nextSibling
             self.forest.insert(0, currentSibling)
             currentSibling.nextSibling = None
+            self.updates += 1
             # print(self.forest[0])
             self.forest[0].parent = None
+            self.updates += 1
             currentSibling = nextSibling
 
         # print("forest length before pairing", len(self.forest))
@@ -128,6 +141,7 @@ class PairingHeapLazy(PairingHeapInterface):
         elif len(self.forest) == 1:
             self.minNodeIndex = 0
             self.minNode = self.forest[0]
+            self.updates += 1
             return (oldMinNode, 0, 0)
         else:
             return (oldMinNode, 0, 0)
@@ -139,13 +153,17 @@ class PairingHeapLazy(PairingHeapInterface):
             return 0
         elif node.parent is None and node.nextSibling is None:  # node is root
             node.key = node.key - diff
+            self.updates += 1
             if node.key < self.minNode.key:
                 self.minNode = node
+                self.updates += 1
         else:
             self.unlink_node(node)
             node.key = node.key - diff
+            self.updates += 1
             if node.key < self.minNode.key:
                 self.minNode = node
+                self.updates += 1
             self.forest += [node]
         return 0
 
@@ -191,23 +209,34 @@ class PairingHeapLazy(PairingHeapInterface):
                 if temp.parent.leftChild == node:  # node is leftmost child
                     # link parent to next sibling
                     temp.parent.leftChild = node.nextSibling
+                    self.updates += 1
                     node.nextSibling = None
                 else:
                     # node is neither first nor last child of parent
                     prevSibling = temp.parent.leftChild
                     while prevSibling.nextSibling != node:  # find left (previous) sibling
                         prevSibling = prevSibling.nextSibling
+                        self.updates += 1
                     prevSibling.nextSibling = node.nextSibling  # cut out node, link left and right sibling
+                    self.updates += 1
                     node.nextSibling = None
+                    self.updates += 1
             else:
                 # node is rightmost child of parent
                 if node.parent.leftChild == node:
                     # node is only child: just remove
                     node.parent.leftChild = None
+                    self.updates += 1
                 else:
                     prevSibling = node.parent.leftChild
                     while prevSibling.nextSibling != node:  # find left (previous) sibling
                         prevSibling = prevSibling.nextSibling
                     prevSibling.parent = node.parent
+                    self.updates += 1
                     prevSibling.nextSibling = None
+                    self.updates += 1
             node.parent = None
+            self.updates += 1
+
+    def pointer_updates(self):
+        return self.updates
