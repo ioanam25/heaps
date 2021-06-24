@@ -81,7 +81,7 @@ def plot_pointer_updates(avgCounts):
         avgPointers = [acounts[k] for acounts in avgCounts[0]]
         maxPointers = [acounts[k] for acounts in avgCounts[1]]
         minPointers = [acounts[k] for acounts in avgCounts[2]]
-        plt.plot(deviations, avgPointers, color=COLOURS[k], linestyle="--", marker=MARKERS_POINTERS[k], markerfacecolor=COLOURS[k], markersize=9, markeredgewidth=1, markeredgecolor='black', label=TYPES[k] + " links")
+        plt.plot(deviations, avgPointers, color=COLOURS[k], linestyle="--", marker=MARKERS_POINTERS[k], markerfacecolor=COLOURS[k], markersize=9, markeredgewidth=1, markeredgecolor='black', label=TYPES[k] + " pointer updates")
         plt.fill_between(deviations, minPointers, maxPointers, color=SHADE_COLOURS[k], alpha=.3)
 
     plt.xlabel('Edge probability', fontsize=39)

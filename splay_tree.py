@@ -3,6 +3,7 @@ from pairing_heap_interface import PairingHeapInterface
 
 class SplayTree(PairingHeapInterface):
     updates = 0
+
     def __init__(self):
         self.root = None
 
@@ -185,12 +186,12 @@ class SplayTree(PairingHeapInterface):
     def pointer_updates(self):
         return self.updates
 
-if __name__ == "__main__":
-    tree = SplayTree()
-    tree.insert(Node(3))
-    tree.insert(Node(4))
-    tree.insert(Node(5))
-    tree.in_order(tree.root)
-    print(tree.find_min().key)
-    tree.delete_min()
-    print(tree.find_min().key)
+# if __name__ == "__main__":
+#     tree = SplayTree()
+#     tree.insert(Node(3))
+#     tree.insert(Node(4))
+#     tree.insert(Node(5))
+#     tree.in_order(tree.root)
+#     print(tree.find_min().key)
+#     tree.delete_min()
+#     print(tree.find_min().key)

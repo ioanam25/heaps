@@ -2,15 +2,15 @@
 """'Universal pairing heap';
 behaviour is decided upon initialisation by a type ID"""
 
-from node import Node
 from pairing_heap_interface import PairingHeapInterface
+from pairing_heap_l import PairingHeapL
 from pairing_heap_standard import PairingHeapStandard
 from pairing_lazy_ioana import PairingHeapLazy
-from smooth_heap import SmoothHeap
-from pairing_heap_l import PairingHeapL
-from smooth_heap_l import SmoothHeapL
-from slim_heap_l import SlimHeapL
 from slim_heap import SlimHeap
+from slim_heap_l import SlimHeapL
+from smooth_heap import SmoothHeap
+from smooth_heap_l import SmoothHeapL
+from splay_tree import SplayTree
 
 COUNT_TYPE_LINKS=-1
 COUNT_TYPE_COMPS=-2
@@ -18,7 +18,7 @@ COUNT_TYPE_BOTH=0
 
 
 class PairingHeap(PairingHeapInterface):
-	MODES = {0: "Pairing_Standard", 12: "Smooth", 21: "Pairing_L", 22: "Smooth_L", 23: "Slim_L", 24: "Slim", 25: "PairingLazy"}
+	MODES = {0: "Pairing_Standard", 12: "Smooth", 21: "Pairing_L", 22: "Smooth_L", 23: "Slim_L", 24: "Slim", 25: "PairingLazy", 26: "SplayTree"}
 	mode = 0
 	countType = COUNT_TYPE_COMPS
 	heap = None
@@ -42,6 +42,8 @@ class PairingHeap(PairingHeapInterface):
 			self.heap = SlimHeap()
 		elif self.mode == 25:
 			self.heap = PairingHeapLazy()
+		elif self.mode == 26:
+			self.heap = SplayTree()
 		else:
 			print(self.mode)
 			raise Exception("Invalid heap ID! No heap of type ID {} is implemented.")
@@ -49,7 +51,6 @@ class PairingHeap(PairingHeapInterface):
 	def find_min(self):
 		return self.heap.find_min()
 
-	# TODO add pointer updates
 	def insert(self, node):
 		"""inserts node; returns number of comparisons and
 		number of linking operations performed"""
