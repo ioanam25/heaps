@@ -9,6 +9,7 @@ class SlimHeap(PairingHeapInterface):
     buffer = []  # decrease buffer
     minNode = None
     size = 0
+    updates = 0
 
     def __init__(self, root=None):
         self.forest = []

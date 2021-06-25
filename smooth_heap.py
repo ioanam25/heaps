@@ -1,14 +1,17 @@
 #!/usr/bin/python3
 from node import Node
 import math
+import sys
 from pairing_heap_interface import PairingHeapInterface
 
+sys.setrecursionlimit(100000)
 
 class SmoothHeap(PairingHeapInterface):
     forest = []  # list storing roots of all top-level trees not in buffer
     buffer = []  # decrease buffer
     minNode = None
     size = 0
+    updates = 0
 
     def __init__(self, root=None):
         self.forest = []

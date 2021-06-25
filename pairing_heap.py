@@ -18,7 +18,7 @@ COUNT_TYPE_BOTH=0
 
 
 class PairingHeap(PairingHeapInterface):
-	MODES = {0: "Pairing_Standard", 12: "Smooth", 21: "Pairing_L", 22: "Smooth_L", 23: "Slim_L", 24: "Slim", 25: "PairingLazy", 26: "SplayTree"}
+	MODES = {0: "Pairing_Standard", 12: "Smooth", 21: "Pairing_L", 22: "Smooth_L", 23: "Slim_L", 24: "Slim", 25: "Pairing Lazy", 26: "SplayTree"}
 	mode = 0
 	countType = COUNT_TYPE_COMPS
 	heap = None
