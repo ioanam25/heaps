@@ -143,6 +143,7 @@ class SplayTree(PairingHeapInterface):
             else:
                 print("broke")
                 return None
+
     def left(self, x):
         if x is None:
             return x
@@ -189,6 +190,7 @@ class SplayTree(PairingHeapInterface):
                     x = x.rightChild
                 else:
                     print("bug3000")
+            self.updates += 1
 
         return x
 
@@ -206,6 +208,7 @@ class SplayTree(PairingHeapInterface):
             predecessor = self.right(x.leftChild)
             x.key, predecessor.key = predecessor.key, x.key
             x = predecessor
+            self.updates += 1
 
         if x.parent is not None:
             parent = x.parent
@@ -223,6 +226,7 @@ class SplayTree(PairingHeapInterface):
                     x.parent.leftChild = None
                 else:
                     x.parent.rightChild = None
+                self.updates += 1
         # one child
         elif x.leftChild is not None:
             if x.parent is not None:
@@ -248,20 +252,21 @@ class SplayTree(PairingHeapInterface):
                 x.rightChild.parent = None
         else:
             print("NO")
-        self.updates += 1
+        self.updates += 2
 
         if parent is None:
             if self.root.leftChild is not None:
                 self.root.min = min(self.root.min, self.root.leftChild.min)
             if self.root.rightChild is not None:
                 self.root.min = min(self.root.min, self.root.rightChild.min)
+            self.updates += 1
         else:
             parent.min = parent.key
             if parent.leftChild is not None:
                 parent.min = min(parent.min, parent.leftChild.min)
             if parent.rightChild is not None:
                 parent.min = min(parent.min, parent.rightChild.min)
-
+            self.updates += 2
             if self.root is None:
                 print("CRY before splay")
             self.splay(parent)

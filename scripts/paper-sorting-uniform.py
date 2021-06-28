@@ -23,10 +23,12 @@ COUNT_TYPE_LINKS = -1
 COUNT_TYPE_COMPS = -2
 MAXSIZE = 18
 NUMBER_TESTS = 5  # number of tests to run
-TYPES = {0: "Pairing", 12: "Smooth", 24:"Slim", 25:"Pairing Lazy"}
+TYPES = {0: "Pairing", 12: "Smooth", 24: "Slim", 25: "Pairing Lazy", 26: "Splay Tree"}
 MAX_TYPE_KEY = max(TYPES.keys())
-COLOURS = {0: 'xkcd:fire engine red', 12:'xkcd:sea green', 24:'xkcd:electric blue', 25:'mauve'}
-SHADE_COLOURS = {0: 'xkcd:fire engine red', 12:'xkcd:sea green', 24:'xkcd:electric blue', 25'mauve'}
+COLOURS = {0: 'xkcd:fire engine red', 12: 'xkcd:sea green', 24: 'xkcd:electric blue', 25: 'xkcd:mauve',
+           26: 'xkcd:tangerine'}
+SHADE_COLOURS = {0: 'xkcd:fire engine red', 12: 'xkcd:sea green', 24: 'xkcd:electric blue', 25: 'xkcd:mauve',
+                 26: 'xkcd:tangerine'}
 
 
 def isSorted(list0):
@@ -35,8 +37,8 @@ def isSorted(list0):
 
 def plot_avg_counts_uni(avgCounts):
     # colours from https://xkcd.com/color/rgb/
-    MARKERS_COMP = {0: "o", 12: "^", 24:"p", 25:"s"}  # https://matplotlib.org/3.1.1/api/markers_api.html
-    MARKERS_LINK = {0: "o", 12: "D", 24:"X", 25:"*"}
+    MARKERS_COMP = {0: "o", 12: "^", 24: "p", 25: "s", 26: "v"}  # https://matplotlib.org/3.1.1/api/markers_api.html
+    MARKERS_LINK = {0: "o", 12: "D", 24: "X", 25: "*", 26: "P"}
     plt.figure('avg number of operations by heap type')
     for k in TYPES.keys():
         avgComps = [acounts[k] for acounts in avgCounts[0]]
@@ -70,6 +72,34 @@ def plot_avg_counts_uni(avgCounts):
     plt.legend(loc='best')
     plt.show()
 
+def plot_pointer_updates(avgCounts):
+	# colours from https://xkcd.com/color/rgb/
+	MARKERS_POINTERS = {0: "o", 12: "^", 24: "p", 25: "s", 26: "v"}
+
+	plt.figure('avg number of pointer updates by heap type')
+	for k in TYPES.keys():
+		print(k)
+		avgPointers = [acounts[k] for acounts in avgCounts[0]]
+		maxPointers = [acounts[k] for acounts in avgCounts[1]]
+		minPointers = [acounts[k] for acounts in avgCounts[2]]
+		plt.plot([2**p for p in range(4, MAXSIZE)], avgPointers[3:MAXSIZE-1], color=COLOURS[k],
+				 linestyle="-", marker=MARKERS_POINTERS[k], markerfacecolor=COLOURS[k], markersize=9,
+				 markeredgewidth=1, markeredgecolor='black', label=TYPES[k] + " pointer updates")
+		plt.fill_between([2**p for p in range(4, MAXSIZE)], minPointers[3:MAXSIZE-1], maxPointers[3:MAXSIZE-1],
+						 color=SHADE_COLOURS[k], alpha=.3)
+
+	plt.xlabel('Input size', fontsize=39)
+	plt.ylabel('Avg. number of pointer updates / size', fontsize=39)
+	plt.xticks(fontsize=30)
+	plt.yticks(fontsize=30)
+	#plt.rc('legend', fontsize=39)  # using a size in points
+	plt.legend()
+	plt.grid(True)
+	figure = plt.gcf()  # get current figure
+	figure.set_size_inches(16, 18)  # set figure's size manually to full screen
+	plt.savefig(r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\plots\pointer-updates-sorting-sep.svg", bbox_inches='tight')  # bbox_inches removes extra white spaces
+	plt.legend(loc='best')
+	plt.show()
 
 def export_results(params, results, countType, heapTypes, filename="sorting-uniform-lazy"):
     # parse data as randomness parameter; counts per heap type
@@ -103,10 +133,14 @@ if __name__ == "__main__":
     testOutputCount = []
     avgLinksPerSize = []
     avgCompsPerSize = []
+    avgPointersPerSize = []
     maxLinksPerSize = []
     maxCompsPerSize = []
+    maxPointersPerSize = []
     minLinksPerSize = []
     minCompsPerSize = []
+    minPointersPerSize = []
+    sortedInput = []
 
     sortedInput = []
     # testInput = []
@@ -116,12 +150,16 @@ if __name__ == "__main__":
 
     for x in params:
         sortedInput = [k for k in range(x)]
+
         avgCountsLinks = [0 for _ in range(MAX_TYPE_KEY + 1)]
         avgCountsComps = [0 for _ in range(MAX_TYPE_KEY + 1)]
+        avgCountsPointers = [0 for _ in range(MAX_TYPE_KEY + 1)]
         maxCountsLinks = [0 for _ in range(MAX_TYPE_KEY + 1)]
-        maxCountsComps = [0 for _ in range(MAX_TYPE_KEY + 1)]
+        maxCountsComps: list[int] = [0 for _ in range(MAX_TYPE_KEY + 1)]
+        maxCountsPointers = [0 for _ in range(MAX_TYPE_KEY + 1)]
         minCountsLinks = [1000000000000 for _ in range(MAX_TYPE_KEY + 1)]
         minCountsComps = [1000000000000 for _ in range(MAX_TYPE_KEY + 1)]
+        minCountsPointers = [1000000000000 for _ in range(MAX_TYPE_KEY + 1)]
 
         for zz in range(NUMBER_TESTS):
             testInput = copy.copy(sortedInput)
@@ -141,14 +179,19 @@ if __name__ == "__main__":
                     testOutput += [minNode.key]
                     compCount += cc
                     linkCount += lc
+
+                pointers = heap.pointer_updates()
                 if isSorted(testOutput):  # sanity check
                     # divide by size for visualization
                     avgCountsLinks[heapType] += (linkCount / x) / NUMBER_TESTS
                     avgCountsComps[heapType] += (compCount / x) / NUMBER_TESTS
+                    avgCountsPointers[heapType] += (pointers / x) / NUMBER_TESTS
                     maxCountsLinks[heapType] = max(maxCountsLinks[heapType], linkCount / x)
                     maxCountsComps[heapType] = max(maxCountsComps[heapType], compCount / x)
+                    maxCountsPointers[heapType] = max(maxCountsPointers[heapType], pointers / x)
                     minCountsLinks[heapType] = min(minCountsLinks[heapType], linkCount / x)
                     minCountsComps[heapType] = min(minCountsComps[heapType], compCount / x)
+                    minCountsPointers[heapType] = min(minCountsPointers[heapType], pointers / x)
                 else:
                     raise Exception("Invalid result for {}".format(TYPES[heapType]))
                 print("[{}: {}, {}/{}] \t Links: {} \t Comps: {}".format(
@@ -158,10 +201,15 @@ if __name__ == "__main__":
                                                                    avgCountsComps[heapType]))
         avgLinksPerSize += [avgCountsLinks]
         avgCompsPerSize += [avgCountsComps]
+        avgPointersPerSize += [avgCountsPointers]
         maxLinksPerSize += [maxCountsLinks]
         maxCompsPerSize += [maxCountsComps]
+        maxPointersPerSize += [maxCountsPointers]
         minLinksPerSize += [minCountsLinks]
         minCompsPerSize += [minCountsComps]
+        minPointersPerSize += [minCountsPointers]
+
     plot_avg_counts_uni(
         [avgCompsPerSize, avgLinksPerSize, maxCompsPerSize, maxLinksPerSize, minCompsPerSize, minLinksPerSize])
-    export_results(params, [avgCompsPerSize, avgLinksPerSize], COUNT_TYPE_BOTH, TYPES, "sorting-uniform-lazy")
+    plot_pointer_updates([avgPointersPerSize, maxPointersPerSize, minPointersPerSize])
+    export_results(params, [avgCompsPerSize, avgLinksPerSize], COUNT_TYPE_BOTH, TYPES, "pointer-updates-sorting-uniform")

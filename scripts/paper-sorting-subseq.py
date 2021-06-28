@@ -27,10 +27,13 @@ NUMBER_TESTS = 20  # number of tests to run
 LIST_LEN = 10000  # number of elements in test list
 TEST_SIZE = 10000  # number of elements in test list
 INCREMENT_SUBSEQS = 100
-TYPES = {0: "Pairing", 12: "Smooth", 24: "Slim", 25: "Pairing Lazy"}
+
+TYPES = {0: "Pairing", 12: "Smooth", 24: "Slim", 25: "Pairing Lazy", 26: "Splay Tree"}
 MAX_TYPE_KEY = max(TYPES.keys())
-COLOURS = {0: 'xkcd:fire engine red', 12:'xkcd:sea green', 24:'xkcd:electric blue', 25:'mauve'}
-SHADE_COLOURS = {0: 'xkcd:fire engine red', 12:'xkcd:sea green', 24:'xkcd:electric blue', 25:'mauve'}
+COLOURS = {0: 'xkcd:fire engine red', 12: 'xkcd:sea green', 24: 'xkcd:electric blue', 25: 'xkcd:mauve',
+           26: 'xkcd:tangerine'}
+SHADE_COLOURS = {0: 'xkcd:fire engine red', 12: 'xkcd:sea green', 24: 'xkcd:electric blue', 25: 'xkcd:mauve',
+                 26: 'xkcd:tangerine'}
 
 
 def isSorted(list0):
@@ -53,8 +56,8 @@ def generateContSortedSubseq(llist, sublen):
 
 def plot_avg_counts(avgCounts):
 	# colours from https://xkcd.com/color/rgb/
-	MARKERS_COMP = {0:"o", 12:"^", 24: "p", 25:"s"}#https://matplotlib.org/3.1.1/api/markers_api.html
-	MARKERS_LINK = {0:"o", 12:"D", 24:"X", 24:"*"}
+	MARKERS_COMP = {0: "o", 12: "^", 24: "p", 25: "s", 26: "v"}  # https://matplotlib.org/3.1.1/api/markers_api.html
+	MARKERS_LINK = {0: "o", 12: "D", 24: "X", 25: "*", 26: "P"}
 	plt.figure('avg number of operations by heap type')
 	deviations = [fac*INCREMENT_SUBSEQS/200 for fac in range(1, math.ceil((TEST_SIZE/5)/INCREMENT_SUBSEQS), 1)]
 	deviations.reverse()
@@ -83,6 +86,37 @@ def plot_avg_counts(avgCounts):
 	figure = plt.gcf()  # get current figure
 	figure.set_size_inches(16, 18)  # set figure's size manually to full screen
 	plt.savefig(r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\plots\paper-sorting-subseq-lazy.svg", bbox_inches='tight')  # bbox_inches removes extra white spaces
+	plt.legend(loc='best')
+	plt.show()
+
+def plot_pointer_updates(avgCounts):
+	# colours from https://xkcd.com/color/rgb/
+	MARKERS_POINTERS = {0: "o", 12: "^", 24: "p", 25: "s", 26: "v"}  # https://matplotlib.org/3.1.1/api/markers_api.html
+	plt.figure('avg number of pointer updates by heap type')
+	deviations = [fac*INCREMENT_SUBSEQS/200 for fac in range(1, math.ceil((TEST_SIZE/5)/INCREMENT_SUBSEQS), 1)]
+	deviations.reverse()
+
+	for k in TYPES.keys():
+		print(k)
+		avgPointers = [acounts[k] for acounts in avgCounts[0]]
+		maxPointers = [acounts[k] for acounts in avgCounts[1]]
+		minPointers = [acounts[k] for acounts in avgCounts[2]]
+		plt.plot(deviations, avgPointers, color=COLOURS[k], linestyle="--", marker=MARKERS_POINTERS[k],
+				 markerfacecolor=COLOURS[k], markersize=9, markeredgewidth=1, markeredgecolor='black',
+				 label=TYPES[k] + " pointer updates")
+		plt.fill_between(deviations, minPointers, maxPointers, color=SHADE_COLOURS[k], alpha=.3)
+
+	plt.xlabel('Avg. length of sorted blocks, % of size', fontsize=39)
+	plt.ylabel('Avg. number of pointer_updates / size', fontsize=39)
+	plt.xticks(fontsize=30)
+	plt.yticks(fontsize=30)
+	#plt.rc('legend', fontsize=39)  # using a size in points
+	plt.legend()
+	plt.grid(True)
+	plt.gca().invert_xaxis()
+	figure = plt.gcf()  # get current figure
+	figure.set_size_inches(16, 18)  # set figure's size manually to full screen
+	plt.savefig(r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\plots\pointer-updates-sorting-subseq.svg", bbox_inches='tight')  # bbox_inches removes extra white spaces
 	plt.legend(loc='best')
 	plt.show()
 
@@ -120,10 +154,13 @@ if __name__ == "__main__":
 	testOutputCount = []
 	avgLinksPerSize = []
 	avgCompsPerSize = []
+	avgPointersPerSize = []
 	maxLinksPerSize = []
 	maxCompsPerSize = []
+	maxPointersPerSize = []
 	minLinksPerSize = []
 	minCompsPerSize = []
+	minPointersPerSize = []
 
 	sortedInput = []
 	# ----------continuous sorted subsequences inputs-----
@@ -133,12 +170,16 @@ if __name__ == "__main__":
 
 	for x in params:
 		sortedInput = [k for k in range(LIST_LEN)]
+
 		avgCountsLinks = [0 for _ in range(MAX_TYPE_KEY + 1)]
 		avgCountsComps = [0 for _ in range(MAX_TYPE_KEY + 1)]
+		avgCountsPointers = [0 for _ in range(MAX_TYPE_KEY + 1)]
 		maxCountsLinks = [0 for _ in range(MAX_TYPE_KEY + 1)]
-		maxCountsComps = [0 for _ in range(MAX_TYPE_KEY + 1)]
+		maxCountsComps: list[int] = [0 for _ in range(MAX_TYPE_KEY + 1)]
+		maxCountsPointers = [0 for _ in range(MAX_TYPE_KEY + 1)]
 		minCountsLinks = [1000000000000 for _ in range(MAX_TYPE_KEY + 1)]
 		minCountsComps = [1000000000000 for _ in range(MAX_TYPE_KEY + 1)]
+		minCountsPointers = [1000000000000 for _ in range(MAX_TYPE_KEY + 1)]
 
 		for zz in range(NUMBER_TESTS):
 			testInput = generateContSortedSubseq(sortedInput, x)
@@ -156,14 +197,19 @@ if __name__ == "__main__":
 					testOutput += [minNode.key]
 					compCount += cc
 					linkCount += lc
+
+				pointers = heap.pointer_updates()
 				if isSorted(testOutput):  # sanity check
 					#divide by size for visualization
-					avgCountsLinks[heapType] += (linkCount/LIST_LEN) / NUMBER_TESTS
-					avgCountsComps[heapType] += (compCount/LIST_LEN) / NUMBER_TESTS
-					maxCountsLinks[heapType] = max(maxCountsLinks[heapType],linkCount/LIST_LEN)
-					maxCountsComps[heapType] = max(maxCountsComps[heapType],compCount/LIST_LEN)
-					minCountsLinks[heapType] = min(minCountsLinks[heapType],linkCount/LIST_LEN)
-					minCountsComps[heapType] = min(minCountsComps[heapType],compCount/LIST_LEN)
+					avgCountsLinks[heapType] += (linkCount / LIST_LEN) / NUMBER_TESTS
+					avgCountsComps[heapType] += (compCount / LIST_LEN) / NUMBER_TESTS
+					avgCountsPointers[heapType] += (pointers / LIST_LEN) / NUMBER_TESTS
+					maxCountsLinks[heapType] = max(maxCountsLinks[heapType], linkCount / 10000)
+					maxCountsComps[heapType] = max(maxCountsComps[heapType], compCount / 10000)
+					maxCountsPointers[heapType] = max(maxCountsPointers[heapType], pointers / 10000)
+					minCountsLinks[heapType] = min(minCountsLinks[heapType], linkCount / 10000)
+					minCountsComps[heapType] = min(minCountsComps[heapType], compCount / 10000)
+					minCountsPointers[heapType] = min(minCountsPointers[heapType], pointers / 10000)
 				else:
 					raise Exception("Invalid result for {}".format(TYPES[heapType]))
 				print("[{}: {}, {}/{}] \t Links: {} \t Comps: {}".format(
@@ -172,10 +218,14 @@ if __name__ == "__main__":
 			print("[{}: {}, avg] \t Links: {} \t Comps: {}".format(TYPES[heapType], x, avgCountsLinks[heapType], avgCountsComps[heapType]))
 		avgLinksPerSize += [avgCountsLinks]
 		avgCompsPerSize += [avgCountsComps]
+		avgPointersPerSize += [avgCountsPointers]
 		maxLinksPerSize += [maxCountsLinks]
 		maxCompsPerSize += [maxCountsComps]
+		maxPointersPerSize += [maxCountsPointers]
 		minLinksPerSize += [minCountsLinks]
 		minCompsPerSize += [minCountsComps]
+		minPointersPerSize += [minCountsPointers]
 	plot_avg_counts([avgCompsPerSize, avgLinksPerSize, maxCompsPerSize, maxLinksPerSize, minCompsPerSize, minLinksPerSize])
-	export_results(params, [avgCompsPerSize, avgLinksPerSize], COUNT_TYPE_BOTH, TYPES, "sorting-subseq-lazy")
+	plot_pointer_updates([avgPointersPerSize, maxPointersPerSize, minPointersPerSize])
+	export_results(params, [avgCompsPerSize, avgLinksPerSize], COUNT_TYPE_BOTH, TYPES, "sorting-subseq-pointer")
 
