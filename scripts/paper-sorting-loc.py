@@ -21,14 +21,14 @@ from pairing_heap import PairingHeap
 COUNT_TYPE_BOTH = 0
 COUNT_TYPE_LINKS = -1
 COUNT_TYPE_COMPS = -2
-NUMBER_TESTS = 10 # number of tests to run TODO change to 10 after testing
+NUMBER_TESTS = 10 # number of tests to run
 INCREMENT_LOC = 0.01
-TYPES = {0: "Pairing", 12: "Smooth", 24: "Slim", 25: "Pairing Lazy", 26: "Splay Tree"}
+TYPES = {0: "Pairing", 12: "Smooth", 24: "Slim", 25: "Pairing Lazy", 27: "Pairing Slim", 28: "Pairing Smooth"}
 MAX_TYPE_KEY = max(TYPES.keys())
 COLOURS = {0: 'xkcd:fire engine red', 12: 'xkcd:sea green', 24: 'xkcd:electric blue', 25: 'xkcd:mauve',
-           26: 'xkcd:tangerine'}
+           27: 'xkcd:tangerine', 28: 'xkcd:pink'}
 SHADE_COLOURS = {0: 'xkcd:fire engine red', 12: 'xkcd:sea green', 24: 'xkcd:electric blue', 25: 'xkcd:mauve',
-                 26: 'xkcd:tangerine'}
+                 27: 'xkcd:tangerine', 28: 'xkcd:pink'}
 
 
 def isSorted(list0):
@@ -47,12 +47,11 @@ def localizedShuffleByIndex(llist, sdev):
     return sortedList
 
 
-def plot_avg_counts(avgCounts):
+def plot_avg_counts_comps(avgCounts):
     # colours from https://xkcd.com/color/rgb/
-    MARKERS_COMP = {0: "o", 12: "^", 24: "p", 25: "s", 26: "v"}  # https://matplotlib.org/3.1.1/api/markers_api.html
-    MARKERS_LINK = {0: "o", 12: "D", 24: "X", 25: "*", 26: "P"}
+    MARKERS_COMP = {0: "o", 12: "^", 24: "p", 25: "s", 26: "v", 27: ".", 28: ">"}  # https://matplotlib.org/3.1.1/api/markers_api.html
 
-    plt.figure('avg number of operations by heap type')
+    plt.figure('avg number of comps by heap type')
     deviations = [fac * INCREMENT_LOC for fac in range(0, math.ceil(0.3 / INCREMENT_LOC), 1)]
     for k in TYPES.keys():
         avgComps = [acounts[k] for acounts in avgCounts[0]]
@@ -62,6 +61,28 @@ def plot_avg_counts(avgCounts):
                  markerfacecolor=COLOURS[k], markersize=9, markeredgewidth=1, markeredgecolor='black',
                  label=TYPES[k] + " comparisons")
         plt.fill_between(deviations, minComps, maxComps, color=SHADE_COLOURS[k], alpha=.3)
+
+    plt.xlabel('Locality parameter', fontsize=39)
+    plt.ylabel('Avg. number of comps / size', fontsize=39)
+    plt.xticks(fontsize=30)
+    plt.yticks(fontsize=30)
+    plt.rc('legend', fontsize=39)  # using a size in points
+    plt.legend()
+    plt.grid(True)
+    figure = plt.gcf()  # get current figure
+    figure.set_size_inches(16, 18)  # set figure's size manually to your full screen (32x18)
+    plt.savefig(r'C:\Users\Admin\PycharmProjects\smooth-heap-pub\plots\paper-sorting-loc-comps.svg',
+                bbox_inches='tight')  # bbox_inches removes extra white spaces
+    plt.legend(loc='best')
+    plt.show()
+
+def plot_avg_counts_links(avgCounts):
+    # colours from https://xkcd.com/color/rgb/
+    MARKERS_LINK = {0: "o", 12: "D", 24: "X", 25: "*", 26: "P", 27: ".", 28: ">"}
+
+    plt.figure('avg number of links by heap type')
+    deviations = [fac * INCREMENT_LOC for fac in range(0, math.ceil(0.3 / INCREMENT_LOC), 1)]
+    for k in TYPES.keys():
         avgLinks = [acounts[k] for acounts in avgCounts[1]]
         maxLinks = [acounts[k] for acounts in avgCounts[3]]
         minLinks = [acounts[k] for acounts in avgCounts[5]]
@@ -71,7 +92,7 @@ def plot_avg_counts(avgCounts):
         plt.fill_between(deviations, minLinks, maxLinks, color=SHADE_COLOURS[k], alpha=.3)
 
     plt.xlabel('Locality parameter', fontsize=39)
-    plt.ylabel('Avg. number of operations / size', fontsize=39)
+    plt.ylabel('Avg. number of links / size', fontsize=39)
     plt.xticks(fontsize=30)
     plt.yticks(fontsize=30)
     plt.rc('legend', fontsize=39)  # using a size in points
@@ -79,7 +100,7 @@ def plot_avg_counts(avgCounts):
     plt.grid(True)
     figure = plt.gcf()  # get current figure
     figure.set_size_inches(16, 18)  # set figure's size manually to your full screen (32x18)
-    plt.savefig(r'C:\Users\Admin\PycharmProjects\smooth-heap-pub\plots\paper-sorting-loc-lazy.svg',
+    plt.savefig(r'C:\Users\Admin\PycharmProjects\smooth-heap-pub\plots\paper-sorting-loc-links.svg',
                 bbox_inches='tight')  # bbox_inches removes extra white spaces
     plt.legend(loc='best')
     plt.show()
@@ -229,7 +250,9 @@ if __name__ == "__main__":
         minCompsPerSize += [minCountsComps]
         minPointersPerSize += [minCountsPointers]
 
-    plot_avg_counts(
+    plot_avg_counts_links(
         [avgCompsPerSize, avgLinksPerSize, maxCompsPerSize, maxLinksPerSize, minCompsPerSize, minLinksPerSize])
-    plot_pointer_updates([avgPointersPerSize, maxPointersPerSize, minPointersPerSize])
+    plot_avg_counts_comps(
+        [avgCompsPerSize, avgLinksPerSize, maxCompsPerSize, maxLinksPerSize, minCompsPerSize, minLinksPerSize])
+    # plot_pointer_updates([avgPointersPerSize, maxPointersPerSize, minPointersPerSize])
     export_results(params, [avgCompsPerSize, avgLinksPerSize], COUNT_TYPE_BOTH, TYPES, "sorting-loc-lazy")

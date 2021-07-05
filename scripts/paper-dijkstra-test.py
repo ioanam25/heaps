@@ -25,12 +25,15 @@ COUNT_TYPE_BOTH = 0
 COUNT_TYPE_LINKS = -1
 COUNT_TYPE_COMPS = -2
 
-TYPES = {21: "Pairing", 22: "Smooth", 23: "Slim", 25: "Pairing Lazy"}
+TYPES = {21: "Pairing", 22: "Smooth", 23: "Slim", 25: "Pairing Lazy", 27: "Pairing Slim", 28: "Pairing Smooth"}
+
 MAX_TYPE_KEY = max(TYPES.keys())
 FIG_LABELS = ["comparisons", "links"]
 
-COLOURS = {21:'xkcd:fire engine red', 22:'xkcd:sea green', 23:'xkcd:electric blue', 25:"xkcd:mauve"}
-SHADE_COLOURS = {21:'xkcd:fire engine red', 22:'xkcd:sea green', 23:'xkcd:electric blue', 25:"xkcd:mauve"}
+COLOURS = {21:'xkcd:fire engine red', 22:'xkcd:sea green', 23:'xkcd:electric blue',
+           25:"xkcd:mauve", 27: "xkcd:pink", 28: "xkcd:orange"}
+SHADE_COLOURS = {21:'xkcd:fire engine red', 22:'xkcd:sea green', 23:'xkcd:electric blue',
+                 25:"xkcd:mauve", 27: "xkcd:pink", 28: "xkcd:orange"}
 
 NUMBER_TESTS = 10  # number of tests to run
 TEST_SIZE = 500
@@ -38,19 +41,14 @@ EDGE_PROBABILITY = 0.05
 WEIGHT_RANGE = 10000
 
 
-def plot_avg_counts(avgCounts):
+def plot_avg_counts_links(avgCounts):
     """generates and saves plot of results"""
     # colours from https://xkcd.com/color/rgb/
-    MARKERS_COMP = {21:"o", 12:"d", 22:"^", 23:"p", 25:"s"}#https://matplotlib.org/3.1.1/api/markers_api.html
-    MARKERS_LINK = {21:"o", 12:"D", 22:"D", 23: "X", 25: "*"}
-    plt.figure('avg number of operations in Dijkstra\'s algorithm')
+    #https://matplotlib.org/3.1.1/api/markers_api.html
+    MARKERS_LINK = {21:"o", 12:"D", 22:"D", 23: "X", 25: "*", 27: "<", 28: "d"}
+    plt.figure('avg number of links in Dijkstra\'s algorithm')
     deviations = [factor * EDGE_PROBABILITY for factor in range(1, 21, 1)]
     for k in TYPES.keys():
-        avgComps = [acounts[k] for acounts in avgCounts[0]]
-        maxComps = [acounts[k] for acounts in avgCounts[2]]
-        minComps = [acounts[k] for acounts in avgCounts[4]]
-        plt.plot(deviations, avgComps, color=COLOURS[k], linestyle="-", marker=MARKERS_COMP[k], markerfacecolor=COLOURS[k], markersize=9, markeredgewidth=1, markeredgecolor='black', label=TYPES[k] + " comparisons")
-        plt.fill_between(deviations, minComps, maxComps, color=SHADE_COLOURS[k], alpha=.3)
         avgLinks = [acounts[k] for acounts in avgCounts[1]]
         maxLinks = [acounts[k] for acounts in avgCounts[3]]
         minLinks = [acounts[k] for acounts in avgCounts[5]]
@@ -58,7 +56,7 @@ def plot_avg_counts(avgCounts):
         plt.fill_between(deviations, minLinks, maxLinks, color=SHADE_COLOURS[k], alpha=.3)
 
     plt.xlabel('Edge probability', fontsize=39)
-    plt.ylabel('Avg. number of operations / size', fontsize=39)
+    plt.ylabel('Avg. number of links / size', fontsize=39)
     plt.xticks(fontsize=30)
     plt.yticks(fontsize=30)
     plt.rc('legend',fontsize=30)  # using a size in points
@@ -66,15 +64,38 @@ def plot_avg_counts(avgCounts):
     plt.grid(True)
     figure = plt.gcf()  # get current figure
     figure.set_size_inches(16, 18)  # set figure's size manually to full screen
-    plt.savefig(r'C:\Users\Admin\PycharmProjects\smooth-heap-pub\plots\paper-dijkstra-lazy.svg', bbox_inches='tight')  # bbox_inches removes extra white spaces
+    plt.savefig(r'C:\Users\Admin\PycharmProjects\smooth-heap-pub\plots\paper-dijkstra-links.svg', bbox_inches='tight')  # bbox_inches removes extra white spaces
+    plt.legend(loc='best')
+    plt.show()
+
+def plot_avg_counts_comps(avgCounts):
+    MARKERS_COMP = {21:"o", 12:"d", 22:"^", 23:"p", 25:"s", 27: ".", 28: ">"}#https://matplotlib.org/3.1.1/api/markers_api.html
+    plt.figure('avg number of comparisons in Dijkstra\'s algorithm')
+    deviations = [factor * EDGE_PROBABILITY for factor in range(1, 21, 1)]
+    for k in TYPES.keys():
+        avgComps = [acounts[k] for acounts in avgCounts[0]]
+        maxComps = [acounts[k] for acounts in avgCounts[2]]
+        minComps = [acounts[k] for acounts in avgCounts[4]]
+        plt.plot(deviations, avgComps, color=COLOURS[k], linestyle="-", marker=MARKERS_COMP[k], markerfacecolor=COLOURS[k], markersize=9, markeredgewidth=1, markeredgecolor='black', label=TYPES[k] + " comparisons")
+        plt.fill_between(deviations, minComps, maxComps, color=SHADE_COLOURS[k], alpha=.3)
+
+    plt.xlabel('Edge probability', fontsize=39)
+    plt.ylabel('Avg. number of comparisons / size', fontsize=39)
+    plt.xticks(fontsize=30)
+    plt.yticks(fontsize=30)
+    plt.rc('legend',fontsize=30)  # using a size in points
+    plt.legend()
+    plt.grid(True)
+    figure = plt.gcf()  # get current figure
+    figure.set_size_inches(16, 18)  # set figure's size manually to full screen
+    plt.savefig(r'C:\Users\Admin\PycharmProjects\smooth-heap-pub\plots\paper-dijkstra-comps.svg', bbox_inches='tight')  # bbox_inches removes extra white spaces
     plt.legend(loc='best')
     plt.show()
 
 def plot_pointer_updates(avgCounts):
     """generates and saves plot of results"""
     # colours from https://xkcd.com/color/rgb/
-    MARKERS_POINTERS = {21:"o", 12:"d", 22:"^", 23:"p", 25:"s"}#https://matplotlib.org/3.1.1/api/markers_api.html
-    plt.figure('avg number of operations in Dijkstra\'s algorithm')
+    MARKERS_POINTERS = {21:"o", 12:"d", 22:"^", 23:"p", 25:"s", 27: ".", 28: ">"}#https://matplotlib.org/3.1.1/api/markers_api.html
     deviations = [factor * EDGE_PROBABILITY for factor in range(1, 21, 1)]
     plt.figure('avg number of pointer updates in Dijkstra\'s algorithm')
     for k in TYPES.keys():
@@ -157,7 +178,7 @@ if __name__ == "__main__":
             graph = nx.fast_gnp_random_graph(TEST_SIZE, x)
             for (u, v) in graph.edges():  # assign weights
                 graph.edges[u, v]['w'] = random.randint(1, WEIGHT_RANGE)
-            heapType: int
+            # heapType: int
             for heapType in TYPES.keys():
                 for v in graph.nodes():
                     graph.nodes[v]['v'] = False  # "visited" marker
@@ -229,6 +250,9 @@ if __name__ == "__main__":
         minCompsPerSize += [minCountsComps]
         minPointersPerSize += [minCountsPointers]
 
-    plot_avg_counts([avgCompsPerSize, avgLinksPerSize, maxCompsPerSize, maxLinksPerSize,  minCompsPerSize, minLinksPerSize])
+    plot_avg_counts_links(
+        [avgCompsPerSize, avgLinksPerSize, maxCompsPerSize, maxLinksPerSize,  minCompsPerSize, minLinksPerSize])
+    plot_avg_counts_comps(
+        [avgCompsPerSize, avgLinksPerSize, maxCompsPerSize, maxLinksPerSize, minCompsPerSize, minLinksPerSize])
     plot_pointer_updates([avgPointersPerSize, maxPointersPerSize, minPointersPerSize])
-    export_results(xs, [avgCompsPerSize, avgLinksPerSize], COUNT_TYPE_BOTH, TYPES, "dijkstra-lazy")
+    # export_results(xs, [avgCompsPerSize, avgLinksPerSize], COUNT_TYPE_BOTH, TYPES, "dijkstra-lazy")

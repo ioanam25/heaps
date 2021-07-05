@@ -6,6 +6,8 @@ from pairing_heap_interface import PairingHeapInterface
 from pairing_heap_l import PairingHeapL
 from pairing_heap_standard import PairingHeapStandard
 from pairing_lazy_ioana import PairingHeapLazy
+from pairing_slim import PairingSlimHeap
+from pairing_smooth import PairingSmoothHeap
 from slim_heap import SlimHeap
 from slim_heap_l import SlimHeapL
 from smooth_heap import SmoothHeap
@@ -18,7 +20,8 @@ COUNT_TYPE_BOTH=0
 
 
 class PairingHeap(PairingHeapInterface):
-	MODES = {0: "Pairing_Standard", 12: "Smooth", 21: "Pairing_L", 22: "Smooth_L", 23: "Slim_L", 24: "Slim", 25: "Pairing Lazy", 26: "SplayTree"}
+	MODES = {0: "Pairing_Standard", 12: "Smooth", 21: "Pairing_L", 22: "Smooth_L", 23: "Slim_L", 24: "Slim",
+			 25: "Pairing Lazy", 26: "SplayTree", 27: "PairingSlim", 28: "PairingSmooth"}
 	mode = 0
 	countType = COUNT_TYPE_COMPS
 	heap = None
@@ -44,6 +47,10 @@ class PairingHeap(PairingHeapInterface):
 			self.heap = PairingHeapLazy()
 		elif self.mode == 26:
 			self.heap = SplayTree()
+		elif self.mode == 27:
+			self.heap = PairingSlimHeap()
+		elif self.mode == 28:
+			self.heap = PairingSmoothHeap()
 		else:
 			print(self.mode)
 			raise Exception("Invalid heap ID! No heap of type ID {} is implemented.")
