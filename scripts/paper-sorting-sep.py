@@ -28,12 +28,13 @@ TEST_SIZE = 10000  # number of elements in test list
 STEP_SIZE = 100
 INCREMENT_LOC = 0.005
 INCREMENT_SUBSEQS = 100
-TYPES = {0: "Pairing", 12: "Smooth", 24: "Slim", 25: "Pairing Lazy", 27: "Pairing Slim", 28: "Pairing Smooth"}
+TYPES = {0: "Pairing", 12: "Smooth", 24: "Slim", 25: "Pairing Lazy",
+		 26: "Splay Tree", 27: "Pairing Slim", 28: "Pairing Smooth"}
 MAX_TYPE_KEY = max(TYPES.keys())
 COLOURS = {0: 'xkcd:fire engine red', 12: 'xkcd:sea green', 24: 'xkcd:electric blue', 25: 'xkcd:mauve',
-           27: 'xkcd:tangerine', 28: 'xkcd:pink'}
+           26: 'xkcd:dark sea green', 27: 'xkcd:tangerine', 28: 'xkcd:pink'}
 SHADE_COLOURS = {0: 'xkcd:fire engine red', 12: 'xkcd:sea green', 24: 'xkcd:electric blue', 25: 'xkcd:mauve',
-                 27: 'xkcd:tangerine', 28: 'xkcd:pink'}
+                 26: 'xkcd:dark sea green', 27: 'xkcd:tangerine', 28: 'xkcd:pink'}
 
 
 def isSorted(list0):
@@ -63,7 +64,7 @@ def plot_avg_counts_links(avgCounts):
 	plt.grid(True)
 	figure = plt.gcf()  # get current figure
 	figure.set_size_inches(16, 18)  # set figure's size manually to full screen
-	plt.savefig(r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\plots\paper-sorting-sep-links.svg", bbox_inches='tight')  # bbox_inches removes extra white spaces
+	plt.savefig(r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\plots\paper-sorting-sep-links-splay.svg", bbox_inches='tight')  # bbox_inches removes extra white spaces
 	plt.legend(loc='best')
 	plt.show()
 
@@ -89,13 +90,13 @@ def plot_avg_counts_comps(avgCounts):
 	plt.grid(True)
 	figure = plt.gcf()  # get current figure
 	figure.set_size_inches(16, 18)  # set figure's size manually to full screen
-	plt.savefig(r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\plots\paper-sorting-sep-comps.svg", bbox_inches='tight')  # bbox_inches removes extra white spaces
+	plt.savefig(r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\plots\paper-sorting-sep-comps-splay.svg", bbox_inches='tight')  # bbox_inches removes extra white spaces
 	plt.legend(loc='best')
 	plt.show()
 
 def plot_pointer_updates(avgCounts):
 	# colours from https://xkcd.com/color/rgb/
-	MARKERS_POINTERS = {0: "o", 12: "^", 24: "p", 25: "s", 26: "v"}
+	MARKERS_POINTERS = {0: "o", 12: "^", 24: "p", 25: "s", 26: "v", 27: "*", 28: "<"}
 
 	plt.figure('avg number of pointer updates by heap type')
 	for k in TYPES.keys():
@@ -118,7 +119,7 @@ def plot_pointer_updates(avgCounts):
 	plt.grid(True)
 	figure = plt.gcf()  # get current figure
 	figure.set_size_inches(16, 18)  # set figure's size manually to full screen
-	plt.savefig(r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\plots\pointer-updates-sorting-sep.svg", bbox_inches='tight')  # bbox_inches removes extra white spaces
+	plt.savefig(r"C:\Users\Admin\PycharmProjects\smooth-heap-pub\plots\pointer-updates-sorting-sep-splay.svg", bbox_inches='tight')  # bbox_inches removes extra white spaces
 	plt.legend(loc='best')
 	plt.show()
 

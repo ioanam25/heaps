@@ -23,7 +23,8 @@ COUNT_TYPE_LINKS = -1
 COUNT_TYPE_COMPS = -2
 NUMBER_TESTS = 10 # number of tests to run
 INCREMENT_LOC = 0.01
-TYPES = {0: "Pairing", 12: "Smooth", 24: "Slim", 25: "Pairing Lazy", 27: "Pairing Slim", 28: "Pairing Smooth"}
+TYPES = {0: "Pairing", 12: "Smooth", 24: "Slim", 25: "Pairing Lazy",
+         27: "Pairing Slim", 28: "Pairing Smooth"}
 MAX_TYPE_KEY = max(TYPES.keys())
 COLOURS = {0: 'xkcd:fire engine red', 12: 'xkcd:sea green', 24: 'xkcd:electric blue', 25: 'xkcd:mauve',
            27: 'xkcd:tangerine', 28: 'xkcd:pink'}
@@ -107,7 +108,7 @@ def plot_avg_counts_links(avgCounts):
 
 def plot_pointer_updates(avgCounts):
     # colours from https://xkcd.com/color/rgb/
-    MARKERS_POINTERS = {0: "o", 12: "^", 24: "p", 25: "s", 26: "v"}  # https://matplotlib.org/3.1.1/api/markers_api.html
+    MARKERS_POINTERS = {0: "o", 12: "^", 24: "p", 25: "s", 26: "v", 27: "*", 28: "<"}  # https://matplotlib.org/3.1.1/api/markers_api.html
 
     plt.figure('avg number of pointer updates by heap type')
     deviations = [fac * INCREMENT_LOC for fac in range(0, math.ceil(0.3 / INCREMENT_LOC), 1)]
@@ -255,4 +256,4 @@ if __name__ == "__main__":
     plot_avg_counts_comps(
         [avgCompsPerSize, avgLinksPerSize, maxCompsPerSize, maxLinksPerSize, minCompsPerSize, minLinksPerSize])
     # plot_pointer_updates([avgPointersPerSize, maxPointersPerSize, minPointersPerSize])
-    export_results(params, [avgCompsPerSize, avgLinksPerSize], COUNT_TYPE_BOTH, TYPES, "sorting-loc-lazy")
+    # export_results(params, [avgCompsPerSize, avgLinksPerSize], COUNT_TYPE_BOTH, TYPES, "sorting-loc-lazy")

@@ -8,9 +8,12 @@ sys.setrecursionlimit(100000)
 
 class SplayTree(PairingHeapInterface):
     updates = 0
+    links = 0
+    comps = 0
 
     def __init__(self):
         self.root = None
+
 
     # rotate left at node x
     def left_rotate(self, x):
@@ -49,25 +52,30 @@ class SplayTree(PairingHeapInterface):
             y.min = min(y.min, y.rightChild.min)
         self.updates += 1
 
-        # x.min = min(x.key, x.leftChild.min, x.rightChild.min)
-        # y.min = min(y.key, y.leftChild.min, y.rightChild.min)
+        self.comps += 4
 
     # rotate left at node y
     def right_rotate(self, x):
         # print("rotate right")
         y = x.leftChild
         x.leftChild = y.rightChild
+        self.updates += 1
         if y.rightChild is not None:
             y.rightChild.parent = x
+            self.updates += 1
         y.parent = x.parent
+        self.updates += 1
         if x.parent is None:
             self.root = y
         elif x == x.parent.rightChild:
             x.parent.rightChild = y
         else:
             x.parent.leftChild = y
+        self.updates += 1
         y.rightChild = x
+        self.updates += 1
         x.parent = y
+        self.updates += 1
 
         x.min = x.key
         if x.leftChild is not None:
@@ -81,39 +89,7 @@ class SplayTree(PairingHeapInterface):
         if y.rightChild is not None:
             y.min = min(y.min, y.rightChild.min)
 
-        #x.min = min(x.key, x.leftChild.min, x.rightChild.min)
-        #y.min = min(y.key, y.left.min, y.rightChild.min)
-
-    # move x to the root of the tree
-    # def splay(self, x):
-    #     print(x.key)
-    #     if x.parent is None:
-    #         return
-    #     # ZIG parent(x) is root
-    #     if x.parent.parent is None:
-    #         if x == x.parent.leftChild:
-    #             self.right_rotate(x.parent)
-    #         else:
-    #             self.left_rotate(x.parent)
-    #
-    #     # ZIG-ZIG x, parent(x) are both left/right children
-    #     elif x == x.parent.leftChild and x.parent == x.parent.parent.leftChild:
-    #         self.right_rotate(x.parent.parent)
-    #         self.right_rotate(x.parent)
-    #     elif x == x.parent.rightChild and x.parent == x.parent.parent.rightChild:
-    #         self.left_rotate(x.parent.parent)
-    #         self.left_rotate(x.parent)
-    #
-    #     # ZIG-ZAG x is left child, parent(x) is right or vice-versa
-    #     elif x == x.parent.rightChild and x.parent == x.parent.parent.leftChild:
-    #         self.left_rotate(x.parent)
-    #         self.right_rotate(x.parent)
-    #
-    #     elif x == x.parent.leftChild and x.parent == x.parent.parent.rightChild:
-    #         self.right_rotate(x.parent)
-    #         self.left_rotate(x.parent)
-    #
-    #     self.splay(x)
+        self.comps += 1
 
     def splay(self, x):
         while x.parent != None:
@@ -170,7 +146,9 @@ class SplayTree(PairingHeapInterface):
         x.parent = leftmost
         x.leftChild = None
         x.rightChild = None
+        x.min = x.key
         self.updates += 3
+        self.links += 1
         self.splay(x)
 
     def find_min_node(self, x):
@@ -194,12 +172,18 @@ class SplayTree(PairingHeapInterface):
 
         return x
 
+    def listInorderTree(self, root):
+        if root is None:
+            return []
+        else:
+            return self.listInorderTree(root.leftChild) + [root.key] + self.listInorderTree(root.nextSibling)
+
     def find_min(self):
-        # self.in_order(self.root)
+        print(self.listInorderTree(self.root))
         x = self.find_min_node(self.root)
         if x.key != self.root.min:
             print("nope")
-        # print(x.key)
+        print(x.key)
         return x
 
     def delete(self, x):
@@ -216,10 +200,6 @@ class SplayTree(PairingHeapInterface):
             parent = None
 
         # leaf, delete it
-        # if x.leftChild is not None and x.leftChild.leftChild is None and x.leftChild.rightChild is None:
-        #     x.leftChild.parent.leftChild = None
-        # elif x.rightChild is not None and x.rightChild.leftChild is None and x.rightChild.rightChild is None:
-        #     x.rightChild.parent.rightChild = None
         if x.leftChild is None and x.rightChild is None:
             if x.parent is not None:
                 if x.parent.leftChild == x:
@@ -275,20 +255,19 @@ class SplayTree(PairingHeapInterface):
         if self.root is None:
             print("cry")
 
-
         return x
         # note new min updates in rotations during splay
 
     def delete_min(self):
-        return (self.delete(self.find_min()), self.updates, self.updates)
+        return (self.delete(self.find_min()), self.comps, self.links)
 
-    def in_order(self, node):
-        if node is not None:
-            if node.leftChild is not None:
-                self.in_order(node.leftChild)
-            print(node.key)
-            if node.rightChild is not None:
-                self.in_order(node.rightChild)
+    # def in_order(self, node):
+    #     if node is not None:
+    #         if node.leftChild is not None:
+    #             self.in_order(node.leftChild)
+    #         print(node.key)
+    #         if node.rightChild is not None:
+    #             self.in_order(node.rightChild)
 
     def pointer_updates(self):
         return self.updates
